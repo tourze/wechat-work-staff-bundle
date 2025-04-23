@@ -33,7 +33,7 @@
   },
   "autoload-dev": {
     "psr-4": {
-      "WechatWorkPushBundle\\Tests\\": "tests"
+      "WechatWorkStaffBundle\\Tests\\": "tests"
     }
   },
   "require-dev": {
