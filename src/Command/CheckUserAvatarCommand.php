@@ -3,8 +3,8 @@
 namespace WechatWorkStaffBundle\Command;
 
 use Doctrine\ORM\EntityManagerInterface;
-use FileSystemBundle\Service\MountManager;
 use HttpClientBundle\Service\SmartHttpClient;
+use League\Flysystem\FilesystemOperator;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -21,7 +21,7 @@ class CheckUserAvatarCommand extends Command
     public function __construct(
         private readonly UserRepository $userRepository,
         private readonly SmartHttpClient $httpClient,
-        private readonly MountManager $mountManager,
+        private readonly FilesystemOperator $mountManager,
         private readonly LoggerInterface $logger,
         private readonly EntityManagerInterface $entityManager,
     ) {
