@@ -1,5 +1,5 @@
 {
-  "name": "extra/wechat-work-staff-bundle",
+  "name": "tourze/wechat-work-staff-bundle",
   "description": "员工管理",
   "type": "symfony-bundle",
   "license": "MIT",
