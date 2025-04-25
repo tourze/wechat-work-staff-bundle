@@ -4,6 +4,7 @@ namespace WechatWorkStaffBundle\Procedure\Department;
 
 use AntdCpBundle\Builder\Action\ApiCallAction;
 use AppBundle\Procedure\Base\ApiCallActionProcedure;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Tourze\JsonRPC\Core\Attribute\MethodExpose;
 use Tourze\JsonRPC\Core\Exception\ApiException;
@@ -25,6 +26,7 @@ class AdminSyncWechatWorkDepartmentToRemote extends ApiCallActionProcedure
 
     public function __construct(
         private readonly DepartmentRepository $departmentRepository,
+        private readonly EntityManagerInterface $entityManager,
         private readonly WorkService $workService,
     ) {
     }
@@ -66,7 +68,8 @@ class AdminSyncWechatWorkDepartmentToRemote extends ApiCallActionProcedure
             $that->setRemoteId($res['id']);
         }
 
-        $this->departmentRepository->save($this);
+        $this->entityManager->persist($this);
+        $this->entityManager->flush();
 
         return [
             '__message' => '同步成功',

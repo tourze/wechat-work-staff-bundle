@@ -8,6 +8,7 @@ use AntdCpBundle\Service\FormFieldBuilder;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Tourze\DoctrineIndexedBundle\Attribute\IndexColumn;
@@ -302,6 +303,7 @@ class Department implements \Stringable
                 array $form,
                 array $record,
                 DepartmentRepository $departmentRepository,
+                EntityManagerInterface $entityManager,
                 AgentRepository $agentRepository,
                 WorkService $workService,
             ) {
@@ -346,7 +348,8 @@ class Department implements \Stringable
                     }
 
                     // TODO department_leader 未处理
-                    $departmentRepository->save($local);
+                    $entityManager->persist($local);
+                    $entityManager->flush();
                 }
 
                 return [
