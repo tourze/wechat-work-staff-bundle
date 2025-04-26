@@ -1,6 +1,6 @@
 {
   "name": "tourze/wechat-work-staff-bundle",
-  "description": "员工管理",
+  "description": "企业微信员工管理",
   "type": "symfony-bundle",
   "license": "MIT",
   "require": {
@@ -11,8 +11,11 @@
     "doctrine/orm": "^2.20 || ^3.0",
     "doctrine/persistence": "^3.1 || ^4",
     "symfony/messenger": "^6.4",
+    "symfony/routing": "^6.4",
+    "symfony/console": "^6.4",
     "symfony/config": "^6.4",
     "symfony/dependency-injection": "^6.4",
+    "symfony/http-foundation": "^6.4",
     "symfony/http-kernel": "^6.4",
     "symfony/framework-bundle": "^6.4",
     "symfony/event-dispatcher": "^6.4",
@@ -23,7 +26,9 @@
     "tourze/easy-admin-attribute": "0.0.*",
     "tourze/http-client-bundle": "0.0.*",
     "tourze/wechat-work-bundle": "0.0.*",
+    "tourze/doctrine-snowflake-bundle": "0.0.*",
     "tourze/doctrine-timestamp-bundle": "0.0.*",
+    "tourze/weui-bundle": "0.0.*",
     "league/flysystem": "^3.0"
   },
   "autoload": {
