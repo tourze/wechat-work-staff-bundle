@@ -10,7 +10,6 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
-use Symfony\Component\Serializer\Attribute\Groups;
 use Tourze\DoctrineIndexedBundle\Attribute\IndexColumn;
 use Tourze\DoctrineIpBundle\Attribute\CreateIpColumn;
 use Tourze\DoctrineIpBundle\Attribute\UpdateIpColumn;
@@ -48,7 +47,6 @@ class User implements \Stringable
 {
     #[ListColumn(order: -1)]
     #[ExportColumn]
-    #[Groups(['restful_read', 'api_tree', 'admin_curd', 'api_list'])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: Types::INTEGER, options: ['comment' => 'ID'])]
@@ -65,28 +63,24 @@ class User implements \Stringable
      * 对应管理端的帐号，企业内必须唯一。
      * 长度为1~64个字节。只能由数字、字母和“_-@.”四种字符组成，且第一个字符必须是数字或字母。系统进行唯一性检查时会忽略大小写。
      */
-    #[Groups(['admin_curd'])]
     #[TrackColumn]
     #[FormField]
     #[ListColumn]
     #[ORM\Column(type: Types::STRING, length: 128, options: ['comment' => '成员UserID'])]
     private ?string $userId = null;
 
-    #[Groups(['admin_curd'])]
     #[TrackColumn]
     #[FormField]
     #[ListColumn]
     #[ORM\Column(type: Types::STRING, length: 128, options: ['comment' => '成员名称'])]
     private ?string $name = null;
 
-    #[Groups(['admin_curd'])]
     #[TrackColumn]
     #[FormField]
     #[ListColumn]
     #[ORM\Column(type: Types::STRING, length: 255, nullable: true, options: ['comment' => '成员别名'])]
     private ?string $alias = null;
 
-    #[Groups(['admin_curd'])]
     #[TrackColumn]
     #[FormField]
     #[ListColumn]
@@ -96,7 +90,6 @@ class User implements \Stringable
     /**
      * 企业内必须唯一，mobile/email二者不能同时为空.
      */
-    #[Groups(['admin_curd'])]
     #[TrackColumn]
     #[FormField]
     #[ListColumn]
@@ -106,7 +99,6 @@ class User implements \Stringable
     /**
      * 长度6~64个字节，且为有效的email格式。企业内必须唯一，mobile/email二者不能同时为空.
      */
-    #[Groups(['admin_curd'])]
     #[TrackColumn]
     #[FormField]
     #[ListColumn]
@@ -116,7 +108,6 @@ class User implements \Stringable
     /**
      * @var Collection<Department>
      */
-    #[Groups(['admin_curd'])]
     #[FormField(title: '所属部门')]
     #[Filterable(label: '所属部门')]
     #[ListColumn(title: '所属部门')]
@@ -127,7 +118,6 @@ class User implements \Stringable
      * 全局唯一。对于同一个服务商，不同应用获取到企业内同一个成员的open_userid是相同的，最多64个字节。仅第三方应用可获取.
      */
     #[TrackColumn]
-    #[Groups(['admin_curd'])]
     #[ORM\Column(type: Types::STRING, length: 120, nullable: true, options: ['comment' => '全局唯一UserID'])]
     private ?string $openUserId = null;
 
@@ -139,12 +129,10 @@ class User implements \Stringable
     private Collection $tags;
 
     #[CreatedByColumn]
-    #[Groups(['restful_read'])]
     #[ORM\Column(nullable: true, options: ['comment' => '创建人'])]
     private ?string $createdBy = null;
 
     #[UpdatedByColumn]
-    #[Groups(['restful_read'])]
     #[ORM\Column(nullable: true, options: ['comment' => '更新人'])]
     private ?string $updatedBy = null;
 
@@ -161,13 +149,11 @@ class User implements \Stringable
     #[ListColumn(order: 98, sorter: true)]
     #[ExportColumn]
     #[CreateTimeColumn]
-    #[Groups(['restful_read', 'admin_curd', 'restful_read'])]
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options: ['comment' => '创建时间'])]
     private ?\DateTimeInterface $createTime = null;
 
     #[UpdateTimeColumn]
     #[ListColumn(order: 99, sorter: true)]
-    #[Groups(['restful_read', 'admin_curd', 'restful_read'])]
     #[Filterable]
     #[ExportColumn]
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options: ['comment' => '更新时间'])]

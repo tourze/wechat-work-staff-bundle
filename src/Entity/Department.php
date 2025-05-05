@@ -10,7 +10,6 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Attribute\Groups;
 use Tourze\DoctrineIndexedBundle\Attribute\IndexColumn;
 use Tourze\DoctrineIpBundle\Attribute\CreateIpColumn;
 use Tourze\DoctrineIpBundle\Attribute\UpdateIpColumn;
@@ -50,21 +49,18 @@ class Department implements \Stringable
 {
     #[ListColumn(order: -1)]
     #[ExportColumn]
-    #[Groups(['restful_read', 'api_tree', 'admin_curd', 'api_list'])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: Types::INTEGER, options: ['comment' => 'ID'])]
     private ?int $id = 0;
 
     #[TrackColumn]
-    #[Groups(['admin_curd', 'api_tree'])]
     #[FormField]
     #[Filterable]
     #[ListColumn]
     #[ORM\Column(type: Types::INTEGER, nullable: true, options: ['comment' => '远程ID'])]
     private ?int $remoteId = null;
 
-    #[Groups(['admin_curd'])]
     #[FormField(title: '所属公司')]
     #[ListColumn(title: '所属公司')]
     #[ORM\ManyToOne(targetEntity: Corp::class)]
@@ -76,7 +72,6 @@ class Department implements \Stringable
 
     #[IndexColumn]
     #[TrackColumn]
-    #[Groups(['admin_curd', 'api_tree'])]
     #[FormField(span: 12)]
     #[Filterable]
     #[ListColumn]
@@ -84,7 +79,6 @@ class Department implements \Stringable
     private ?string $name = null;
 
     #[TrackColumn]
-    #[Groups(['admin_curd', 'api_tree'])]
     #[FormField(span: 12)]
     #[Filterable]
     #[ORM\Column(type: Types::STRING, length: 255, nullable: true, options: ['comment' => '英文名称'])]
@@ -98,7 +92,6 @@ class Department implements \Stringable
      * order值大的排序靠前。有效的值范围是[0, 2^32].
      */
     #[IndexColumn]
-    #[Groups(['admin_curd', 'api_tree', 'restful_read', 'restful_write'])]
     #[FormField]
     #[ListColumn(order: 95, sorter: true)]
     #[ORM\Column(type: Types::BIGINT, nullable: true, options: ['default' => '0', 'comment' => '次序值'])]
@@ -107,8 +100,7 @@ class Department implements \Stringable
     /**
      * @var Collection<Department>
      */
-    #[Groups(['api_tree'])]
-    #[ORM\OneToMany(mappedBy: 'parent', targetEntity: Department::class)]
+    #[ORM\OneToMany(targetEntity: Department::class, mappedBy: 'parent')]
     private Collection $children;
 
     /**
@@ -118,12 +110,10 @@ class Department implements \Stringable
     private Collection $users;
 
     #[CreatedByColumn]
-    #[Groups(['restful_read'])]
     #[ORM\Column(nullable: true, options: ['comment' => '创建人'])]
     private ?string $createdBy = null;
 
     #[UpdatedByColumn]
-    #[Groups(['restful_read'])]
     #[ORM\Column(nullable: true, options: ['comment' => '更新人'])]
     private ?string $updatedBy = null;
 
@@ -140,13 +130,11 @@ class Department implements \Stringable
     #[ListColumn(order: 98, sorter: true)]
     #[ExportColumn]
     #[CreateTimeColumn]
-    #[Groups(['restful_read', 'admin_curd', 'restful_read'])]
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options: ['comment' => '创建时间'])]
     private ?\DateTimeInterface $createTime = null;
 
     #[UpdateTimeColumn]
     #[ListColumn(order: 99, sorter: true)]
-    #[Groups(['restful_read', 'admin_curd', 'restful_read'])]
     #[Filterable]
     #[ExportColumn]
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options: ['comment' => '更新时间'])]

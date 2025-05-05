@@ -16,3 +16,7 @@ services:
     resource: '../../Repository/'
   WechatWorkStaffBundle\Service\:
     resource: '../../Service/'
+
+  wechat-work-staff-bundle.property-accessor:
+    class: Symfony\Component\PropertyAccess\PropertyAccessor
+    factory: [ 'Symfony\Component\PropertyAccess\PropertyAccess', 'createPropertyAccessor' ]

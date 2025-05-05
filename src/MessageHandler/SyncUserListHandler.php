@@ -4,6 +4,7 @@ namespace WechatWorkStaffBundle\MessageHandler;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use WechatWorkBundle\Repository\AgentRepository;
@@ -19,7 +20,7 @@ use WechatWorkStaffBundle\Service\BizUserService;
 class SyncUserListHandler
 {
     public function __construct(
-        private readonly PropertyAccessor $propertyAccessor,
+        #[Autowire(service: 'wechat-work-staff-bundle.property-accessor')] private readonly PropertyAccessor $propertyAccessor,
         private readonly AgentRepository $agentRepository,
         private readonly UserRepository $userRepository,
         private readonly DepartmentRepository $departmentRepository,
