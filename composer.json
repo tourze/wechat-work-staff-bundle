@@ -28,7 +28,7 @@
     "tourze/easy-admin-attribute": "0.1.*",
     "tourze/http-client-bundle": "0.1.*",
     "tourze/wechat-work-bundle": "0.1.*",
-    "tourze/doctrine-snowflake-bundle": "0.0.*",
+    "tourze/doctrine-snowflake-bundle": "0.1.*",
     "tourze/doctrine-timestamp-bundle": "0.0.*",
     "tourze/weui-bundle": "0.0.*",
     "league/flysystem": "^3.0",
