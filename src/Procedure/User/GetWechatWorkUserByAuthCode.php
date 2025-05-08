@@ -4,6 +4,7 @@ namespace WechatWorkStaffBundle\Procedure\User;
 
 use Doctrine\ORM\EntityManagerInterface;
 use JWTAuthenticationBundle\TokenManager\JWTTokenManagerInterface;
+use Monolog\Attribute\WithMonologChannel;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -27,6 +28,7 @@ use WechatWorkStaffBundle\Service\BizUserService;
 #[Log]
 #[MethodExpose('GetWechatWorkUserByAuthCode')]
 #[MethodDoc('根据企业微信返回的Code来获取用户信息')]
+#[WithMonologChannel('procedure')]
 class GetWechatWorkUserByAuthCode extends LockableProcedure
 {
     #[MethodParam('企业ID')]
@@ -45,7 +47,7 @@ class GetWechatWorkUserByAuthCode extends LockableProcedure
         private readonly BizUserService $bizUserService,
         private readonly JWTTokenManagerInterface $jwtManager,
         private readonly WorkService $workService,
-        private readonly LoggerInterface $procedureLogger,
+        private readonly LoggerInterface $logger,
         private readonly EntityManagerInterface $entityManager,
     ) {
     }
@@ -70,7 +72,7 @@ class GetWechatWorkUserByAuthCode extends LockableProcedure
         $request->setAgent($agent);
         $request->setCode($code);
         $getUserInfoByCodeResponse = $this->workService->request($request);
-        $this->procedureLogger->info('企业微信获取访问用户身份返回', $getUserInfoByCodeResponse);
+        $this->logger->info('企业微信获取访问用户身份返回', $getUserInfoByCodeResponse);
         if (!isset($getUserInfoByCodeResponse['userid'])) {
             throw new BadRequestException('找不到userId');
         }
@@ -79,7 +81,7 @@ class GetWechatWorkUserByAuthCode extends LockableProcedure
         $request->setAgent($agent);
         $request->setUserId($getUserInfoByCodeResponse['userid']);
         $getUserResponse = $this->workService->request($request);
-        $this->procedureLogger->info('企业微信读取成员返回', $getUserResponse);
+        $this->logger->info('企业微信读取成员返回', $getUserResponse);
 
         $result = $getUserResponse;
 
@@ -89,7 +91,7 @@ class GetWechatWorkUserByAuthCode extends LockableProcedure
             $request->setAgent($agent);
             $request->setUserTicket($getUserInfoByCodeResponse['user_ticket']);
             $getUserDetailByTicketResponse = $this->workService->request($request);
-            $this->procedureLogger->info('企业微信获获取访问用户敏感信息返回', $getUserDetailByTicketResponse);
+            $this->logger->info('企业微信获获取访问用户敏感信息返回', $getUserDetailByTicketResponse);
 
             if (empty($result['avatar'])) {
                 $result['avatar'] = $getUserDetailByTicketResponse['avatar'];
