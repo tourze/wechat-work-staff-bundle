@@ -3,8 +3,8 @@
 namespace WechatWorkStaffBundle\Service;
 
 use AppBundle\Entity\BizUser;
-use AppBundle\Repository\BizUserRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface;
 use WechatWorkExternalContactBundle\Entity\ExternalUser;
 use WechatWorkStaffBundle\Entity\User;
 use WechatWorkStaffBundle\Repository\UserRepository;
@@ -12,7 +12,7 @@ use WechatWorkStaffBundle\Repository\UserRepository;
 class BizUserService
 {
     public function __construct(
-        private readonly BizUserRepository $bizUserRepository,
+        private readonly UserLoaderInterface $userLoader,
         private readonly UserRepository $userRepository,
         private readonly EntityManagerInterface $entityManager,
     ) {
@@ -23,9 +23,7 @@ class BizUserService
      */
     public function transformFromExternalUser(ExternalUser $user): BizUser
     {
-        $bizUser = $this->bizUserRepository->findOneBy([
-            'username' => $user->getExternalUserId(),
-        ]);
+        $bizUser = $this->userLoader->loadUserByIdentifier($user->getExternalUserId());
         if (!$bizUser) {
             $bizUser = new BizUser();
             $bizUser->setUsername($user->getExternalUserId());
@@ -62,9 +60,7 @@ class BizUserService
      */
     public function transformFromWorkUser(User $user): BizUser
     {
-        $bizUser = $this->bizUserRepository->findOneBy([
-            'username' => $user->getUserId(),
-        ]);
+        $bizUser = $this->userLoader->loadUserByIdentifier($user->getUserId());
         if (!$bizUser) {
             $bizUser = new BizUser();
             $bizUser->setUsername($user->getUserId());
