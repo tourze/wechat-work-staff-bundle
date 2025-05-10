@@ -2,8 +2,8 @@
 
 namespace WechatWorkStaffBundle\Procedure\User;
 
+use AccessTokenBundle\Service\AccessTokenService;
 use Doctrine\ORM\EntityManagerInterface;
-use JWTAuthenticationBundle\TokenManager\JWTTokenManagerInterface;
 use Monolog\Attribute\WithMonologChannel;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
@@ -45,7 +45,7 @@ class GetWechatWorkUserByAuthCode extends LockableProcedure
         private readonly AgentRepository $agentRepository,
         private readonly UserRepository $userRepository,
         private readonly BizUserService $bizUserService,
-        private readonly JWTTokenManagerInterface $jwtManager,
+        private readonly AccessTokenService $accessTokenService,
         private readonly WorkService $workService,
         private readonly LoggerInterface $logger,
         private readonly EntityManagerInterface $entityManager,
@@ -133,7 +133,7 @@ class GetWechatWorkUserByAuthCode extends LockableProcedure
 
         // 转换为系统用户，并生成JWT
         $bizUser = $this->bizUserService->transformFromWorkUser($workUser);
-        $result['jwt'] = $this->jwtManager->create($bizUser);
+        $result['jwt'] = $this->accessTokenService->createToken($bizUser);
 
         return $result;
     }

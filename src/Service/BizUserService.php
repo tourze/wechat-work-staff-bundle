@@ -5,6 +5,7 @@ namespace WechatWorkStaffBundle\Service;
 use AppBundle\Entity\BizUser;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 use WechatWorkExternalContactBundle\Entity\ExternalUser;
 use WechatWorkStaffBundle\Entity\User;
 use WechatWorkStaffBundle\Repository\UserRepository;
@@ -58,7 +59,7 @@ class BizUserService
     /**
      * 转换企微的员工/接待，为系统用户
      */
-    public function transformFromWorkUser(User $user): BizUser
+    public function transformFromWorkUser(User $user): UserInterface
     {
         $bizUser = $this->userLoader->loadUserByIdentifier($user->getUserId());
         if (!$bizUser) {
