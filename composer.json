@@ -24,6 +24,7 @@
     "symfony/messenger": "^6.4",
     "symfony/property-access": "^6.4",
     "symfony/routing": "^6.4",
+    "symfony/security-http": "^6.4",
     "symfony/serializer": "^6.4",
     "symfony/yaml": "^6.4 || ^7.1",
     "tourze/doctrine-indexed-bundle": "0.0.*",
