@@ -2,7 +2,6 @@
 
 namespace WechatWorkStaffBundle\Entity;
 
-use AntdCpBundle\Attribute\TreeView;
 use AntdCpBundle\Builder\Action\ModalFormAction;
 use AntdCpBundle\Service\FormFieldBuilder;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -25,6 +24,7 @@ use Tourze\EasyAdmin\Attribute\Action\HeaderAction;
 use Tourze\EasyAdmin\Attribute\Action\Listable;
 use Tourze\EasyAdmin\Attribute\Column\ExportColumn;
 use Tourze\EasyAdmin\Attribute\Column\ListColumn;
+use Tourze\EasyAdmin\Attribute\Column\TreeView;
 use Tourze\EasyAdmin\Attribute\Field\FormField;
 use Tourze\EasyAdmin\Attribute\Filter\Filterable;
 use Tourze\EasyAdmin\Attribute\Permission\AsPermission;
