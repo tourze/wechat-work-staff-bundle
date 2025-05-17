@@ -2,12 +2,9 @@
 
 namespace WechatWorkStaffBundle\Entity;
 
-use AntdCpBundle\Builder\Action\ModalFormAction;
-use AntdCpBundle\Service\FormFieldBuilder;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Tourze\DoctrineIndexedBundle\Attribute\IndexColumn;
 use Tourze\DoctrineIpBundle\Attribute\CreateIpColumn;
@@ -20,7 +17,6 @@ use Tourze\DoctrineUserBundle\Attribute\UpdatedByColumn;
 use Tourze\EasyAdmin\Attribute\Action\Creatable;
 use Tourze\EasyAdmin\Attribute\Action\Deletable;
 use Tourze\EasyAdmin\Attribute\Action\Editable;
-use Tourze\EasyAdmin\Attribute\Action\HeaderAction;
 use Tourze\EasyAdmin\Attribute\Action\Listable;
 use Tourze\EasyAdmin\Attribute\Column\ExportColumn;
 use Tourze\EasyAdmin\Attribute\Column\ListColumn;
@@ -28,13 +24,9 @@ use Tourze\EasyAdmin\Attribute\Column\TreeView;
 use Tourze\EasyAdmin\Attribute\Field\FormField;
 use Tourze\EasyAdmin\Attribute\Filter\Filterable;
 use Tourze\EasyAdmin\Attribute\Permission\AsPermission;
-use Tourze\JsonRPC\Core\Exception\ApiException;
 use WechatWorkBundle\Entity\Agent;
 use WechatWorkBundle\Entity\Corp;
-use WechatWorkBundle\Repository\AgentRepository;
-use WechatWorkBundle\Service\WorkService;
 use WechatWorkStaffBundle\Repository\DepartmentRepository;
-use WechatWorkStaffBundle\Request\Department\GetDepartmentListRequest;
 
 #[AsPermission(title: '部门信息')]
 #[Listable]
@@ -272,81 +264,6 @@ class Department implements \Stringable
         $this->users->removeElement($user);
 
         return $this;
-    }
-
-    #[HeaderAction(title: '从企业微信服务器同步', featureKey: 'WECHAT_WORK_DEPARTMENT_SYNC_FROM_AGENT')]
-    public function renderSyncFromAgentButton(FormFieldBuilder $fieldHelper): ModalFormAction
-    {
-        return ModalFormAction::gen()
-            ->setFormTitle('从企业微信服务器同步')
-            ->setLabel('从企业微信服务器同步')
-            ->setFormWidth(600)
-            ->setFormFields([
-                $fieldHelper->createSelectFromEntityClass(Agent::class)
-                    ->setSpan(12)
-                    ->setId('from_agent')
-                    ->setLabel('同步应用'),
-            ])
-            ->setCallback(function (
-                array $form,
-                array $record,
-                DepartmentRepository $departmentRepository,
-                EntityManagerInterface $entityManager,
-                AgentRepository $agentRepository,
-                WorkService $workService,
-            ) {
-                $agent = $agentRepository->find($form['from_agent']);
-                $request = new GetDepartmentListRequest();
-                $request->setAgent($agent);
-
-                try {
-                    $list = $workService->request($request);
-                } catch (\Throwable $exception) {
-                    throw new ApiException($exception->getMessage(), previous: $exception);
-                }
-
-                foreach ($list['department'] as $item) {
-                    $local = $departmentRepository->findOneBy([
-                        'corp' => $agent->getCorp(),
-                        'remoteId' => $item['id'],
-                    ]);
-                    if (!$local) {
-                        $local = new Department();
-                        $local->setCorp($agent->getCorp());
-                        $local->setRemoteId($item['id']);
-                    }
-
-                    $local->setAgent($agent);
-                    $local->setName($item['name']);
-                    $local->setSortNumber($item['order']);
-
-                    // 保存上级
-                    if ($item['parentid'] > 0) {
-                        $parent = $departmentRepository->findOneBy([
-                            'corp' => $agent->getCorp(),
-                            'remoteId' => $item['parentid'],
-                        ]);
-                        if ($parent) {
-                            $local->setParent($parent);
-                        } else {
-                            $local->setParent(null);
-                        }
-                    } else {
-                        $local->setParent(null);
-                    }
-
-                    // TODO department_leader 未处理
-                    $entityManager->persist($local);
-                    $entityManager->flush();
-                }
-
-                return [
-                    '__message' => '同步成功',
-                    'form' => $form,
-                    'record' => $record,
-                    // 'list' => $list,
-                ];
-            });
     }
 
     public function getCorp(): ?Corp

@@ -22,7 +22,7 @@ class BizUserService
     /**
      * 转换企微外部联系人，为系统用户
      */
-    public function transformFromExternalUser(ExternalContactInterface $user): BizUser
+    public function transformFromExternalUser(ExternalContactInterface $user): UserInterface
     {
         $bizUser = $this->userLoader->loadUserByIdentifier($user->getExternalUserId());
         if (!$bizUser) {

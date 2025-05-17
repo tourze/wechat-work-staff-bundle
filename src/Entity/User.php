@@ -2,14 +2,10 @@
 
 namespace WechatWorkStaffBundle\Entity;
 
-use AntdCpBundle\Builder\Action\ModalFormAction;
-use AntdCpBundle\Service\FormFieldBuilder;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\Messenger\MessageBusInterface;
 use Tourze\DoctrineIndexedBundle\Attribute\IndexColumn;
 use Tourze\DoctrineIpBundle\Attribute\CreateIpColumn;
 use Tourze\DoctrineIpBundle\Attribute\UpdateIpColumn;
@@ -21,18 +17,14 @@ use Tourze\DoctrineUserBundle\Attribute\UpdatedByColumn;
 use Tourze\EasyAdmin\Attribute\Action\Creatable;
 use Tourze\EasyAdmin\Attribute\Action\Deletable;
 use Tourze\EasyAdmin\Attribute\Action\Editable;
-use Tourze\EasyAdmin\Attribute\Action\HeaderAction;
 use Tourze\EasyAdmin\Attribute\Action\Listable;
 use Tourze\EasyAdmin\Attribute\Column\ExportColumn;
 use Tourze\EasyAdmin\Attribute\Column\ListColumn;
 use Tourze\EasyAdmin\Attribute\Field\FormField;
 use Tourze\EasyAdmin\Attribute\Filter\Filterable;
 use Tourze\EasyAdmin\Attribute\Permission\AsPermission;
-use Tourze\JsonRPC\Core\Exception\ApiException;
 use WechatWorkBundle\Entity\Agent;
 use WechatWorkBundle\Entity\Corp;
-use WechatWorkBundle\Repository\AgentRepository;
-use WechatWorkStaffBundle\Message\SyncUserListMessage;
 use WechatWorkStaffBundle\Repository\UserRepository;
 
 #[AsPermission(title: '成员信息')]
@@ -300,52 +292,6 @@ class User implements \Stringable
         $this->openUserId = $openUserId;
 
         return $this;
-    }
-
-    #[HeaderAction(title: '从企业微信服务器同步', featureKey: 'WECHAT_WORK_USER_SYNC_FROM_AGENT')]
-    public function renderSyncFromAgentButton(FormFieldBuilder $fieldHelper): ModalFormAction
-    {
-        return ModalFormAction::gen()
-            ->setFormTitle('从企业微信服务器同步')
-            ->setLabel('从企业微信服务器同步')
-            ->setFormWidth(600)
-            ->setFormFields([
-                $fieldHelper->createSelectFromEntityClass(Agent::class)
-                    ->setSpan(12)
-                    ->setId('from_agent')
-                    ->setLabel('同步应用'),
-            ])
-            ->setCallback(function (
-                array $form,
-                array $record,
-                MessageBusInterface $messageBus,
-                AgentRepository $agentRepository,
-                LoggerInterface $logger,
-            ) {
-                $agent = $agentRepository->find($form['from_agent']);
-                if (!$agent) {
-                    throw new ApiException('找不到应用');
-                }
-
-                try {
-                    $message = new SyncUserListMessage();
-                    $message->setAgentId($agent->getId());
-                    $messageBus->dispatch($message);
-                } catch (\Throwable $exception) {
-                    $logger->error('同步企微用户列表时发生异常', [
-                        'exception' => $exception,
-                        'agent' => $agent,
-                    ]);
-                    throw new ApiException('同步时发生异常：' . $exception->getMessage(), previous: $exception);
-                }
-
-                return [
-                    '__message' => '正在同步，请稍后查看',
-                    'form' => $form,
-                    'record' => $record,
-                    // 'list' => $list,
-                ];
-            });
     }
 
     public function getPosition(): ?string
