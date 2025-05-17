@@ -6,7 +6,7 @@ use AppBundle\Entity\BizUser;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
-use WechatWorkExternalContactBundle\Entity\ExternalUser;
+use Tourze\WechatWorkExternalContactModel\ExternalContactInterface;
 use WechatWorkStaffBundle\Entity\User;
 use WechatWorkStaffBundle\Repository\UserRepository;
 
@@ -22,7 +22,7 @@ class BizUserService
     /**
      * 转换企微外部联系人，为系统用户
      */
-    public function transformFromExternalUser(ExternalUser $user): BizUser
+    public function transformFromExternalUser(ExternalContactInterface $user): BizUser
     {
         $bizUser = $this->userLoader->loadUserByIdentifier($user->getExternalUserId());
         if (!$bizUser) {
