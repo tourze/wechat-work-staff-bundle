@@ -165,9 +165,9 @@ class Department implements \Stringable, DepartmentInterface
         return $this;
     }
 
-    public function getName(): ?string
+    public function getName(): string
     {
-        return $this->name;
+        return (string)$this->name;
     }
 
     public function setName(string $name): self
