@@ -31,6 +31,7 @@
     "tourze/access-token-bundle": "0.0.*",
     "tourze/doctrine-indexed-bundle": "0.0.*",
     "tourze/doctrine-ip-bundle": "0.0.*",
+    "tourze/doctrine-resolve-target-entity-bundle": "0.0.*",
     "tourze/doctrine-snowflake-bundle": "0.1.*",
     "tourze/doctrine-timestamp-bundle": "0.0.*",
     "tourze/doctrine-track-bundle": "0.1.*",
@@ -44,6 +45,7 @@
     "tourze/user-service-contracts": "0.0.*",
     "tourze/wechat-work-bundle": "0.1.*",
     "tourze/wechat-work-external-contact-model": "0.0.*",
+    "tourze/wechat-work-staff-model": "0.0.*",
     "tourze/weui-bundle": "0.0.*",
     "twig/twig": "^3.13|^4.0"
   },

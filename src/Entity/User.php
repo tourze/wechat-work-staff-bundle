@@ -23,6 +23,7 @@ use Tourze\EasyAdmin\Attribute\Column\ListColumn;
 use Tourze\EasyAdmin\Attribute\Field\FormField;
 use Tourze\EasyAdmin\Attribute\Filter\Filterable;
 use Tourze\EasyAdmin\Attribute\Permission\AsPermission;
+use Tourze\WechatWorkStaffModel\UserInterface;
 use WechatWorkBundle\Entity\Agent;
 use WechatWorkBundle\Entity\Corp;
 use WechatWorkStaffBundle\Repository\UserRepository;
@@ -35,7 +36,7 @@ use WechatWorkStaffBundle\Repository\UserRepository;
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: 'wechat_work_user', options: ['comment' => '成员信息'])]
 #[ORM\UniqueConstraint(name: 'wechat_work_user_idx_uniq', columns: ['user_id', 'corp_id'])]
-class User implements \Stringable
+class User implements \Stringable, UserInterface
 {
     #[ListColumn(order: -1)]
     #[ExportColumn]

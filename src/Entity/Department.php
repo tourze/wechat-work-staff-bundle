@@ -24,6 +24,7 @@ use Tourze\EasyAdmin\Attribute\Column\TreeView;
 use Tourze\EasyAdmin\Attribute\Field\FormField;
 use Tourze\EasyAdmin\Attribute\Filter\Filterable;
 use Tourze\EasyAdmin\Attribute\Permission\AsPermission;
+use Tourze\WechatWorkStaffModel\DepartmentInterface;
 use WechatWorkBundle\Entity\Agent;
 use WechatWorkBundle\Entity\Corp;
 use WechatWorkStaffBundle\Repository\DepartmentRepository;
@@ -37,7 +38,7 @@ use WechatWorkStaffBundle\Repository\DepartmentRepository;
 #[ORM\Entity(repositoryClass: DepartmentRepository::class)]
 #[ORM\Table(name: 'wechat_work_department', options: ['comment' => '部门信息'])]
 #[ORM\UniqueConstraint(name: 'wechat_work_department_idx_uniq_name', columns: ['corp_id', 'parent_id', 'name'])]
-class Department implements \Stringable
+class Department implements \Stringable, DepartmentInterface
 {
     #[ListColumn(order: -1)]
     #[ExportColumn]
