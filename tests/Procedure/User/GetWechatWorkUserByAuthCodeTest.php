@@ -10,6 +10,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Tourze\WechatWorkContracts\UserLoaderInterface;
 use WechatWorkBundle\Entity\Agent;
 use WechatWorkBundle\Entity\Corp;
 use WechatWorkBundle\Repository\AgentRepository;
@@ -17,26 +18,25 @@ use WechatWorkBundle\Repository\CorpRepository;
 use WechatWorkBundle\Service\WorkService;
 use WechatWorkStaffBundle\Entity\User;
 use WechatWorkStaffBundle\Procedure\User\GetWechatWorkUserByAuthCode;
-use WechatWorkStaffBundle\Repository\UserRepository;
 use WechatWorkStaffBundle\Service\BizUserService;
 
 class GetWechatWorkUserByAuthCodeTest extends TestCase
 {
-    private MockObject|CorpRepository $corpRepository;
-    private MockObject|AgentRepository $agentRepository;
-    private MockObject|UserRepository $userRepository;
-    private MockObject|BizUserService $bizUserService;
-    private MockObject|AccessTokenService $accessTokenService;
-    private MockObject|WorkService $workService;
-    private MockObject|LoggerInterface $logger;
-    private MockObject|EntityManagerInterface $entityManager;
+    private CorpRepository&MockObject $corpRepository;
+    private AgentRepository&MockObject $agentRepository;
+    private UserLoaderInterface&MockObject $userLoader;
+    private BizUserService&MockObject $bizUserService;
+    private AccessTokenService&MockObject $accessTokenService;
+    private WorkService&MockObject $workService;
+    private LoggerInterface&MockObject $logger;
+    private EntityManagerInterface&MockObject $entityManager;
     private GetWechatWorkUserByAuthCode $procedure;
     
     protected function setUp(): void
     {
         $this->corpRepository = $this->createMock(CorpRepository::class);
         $this->agentRepository = $this->createMock(AgentRepository::class);
-        $this->userRepository = $this->createMock(UserRepository::class);
+        $this->userLoader = $this->createMock(UserLoaderInterface::class);
         $this->bizUserService = $this->createMock(BizUserService::class);
         $this->accessTokenService = $this->createMock(AccessTokenService::class);
         $this->workService = $this->createMock(WorkService::class);
@@ -46,7 +46,7 @@ class GetWechatWorkUserByAuthCodeTest extends TestCase
         $this->procedure = new GetWechatWorkUserByAuthCode(
             $this->corpRepository,
             $this->agentRepository,
-            $this->userRepository,
+            $this->userLoader,
             $this->bizUserService,
             $this->accessTokenService,
             $this->workService,
@@ -63,11 +63,12 @@ class GetWechatWorkUserByAuthCodeTest extends TestCase
     {
         $expectedResult = ['key' => 'value'];
         
-        $this->procedure = $this->getMockBuilder(GetWechatWorkUserByAuthCode::class)
+        /** @var GetWechatWorkUserByAuthCode&MockObject $procedure */
+        $procedure = $this->getMockBuilder(GetWechatWorkUserByAuthCode::class)
             ->setConstructorArgs([
                 $this->corpRepository,
                 $this->agentRepository,
-                $this->userRepository,
+                $this->userLoader,
                 $this->bizUserService,
                 $this->accessTokenService,
                 $this->workService,
@@ -77,16 +78,16 @@ class GetWechatWorkUserByAuthCodeTest extends TestCase
             ->onlyMethods(['getResult'])
             ->getMock();
         
-        $this->procedure->corpId = 'corp-123';
-        $this->procedure->agentId = 'agent-123';
-        $this->procedure->code = 'auth-code-123';
+        $procedure->corpId = 'corp-123';
+        $procedure->agentId = 'agent-123';
+        $procedure->code = 'auth-code-123';
         
-        $this->procedure->expects($this->once())
+        $procedure->expects($this->once())
             ->method('getResult')
             ->with('corp-123', 'agent-123', 'auth-code-123')
             ->willReturn($expectedResult);
             
-        $result = $this->procedure->execute();
+        $result = $procedure->execute();
         
         $this->assertSame($expectedResult, $result);
     }
@@ -187,12 +188,9 @@ class GetWechatWorkUserByAuthCodeTest extends TestCase
                 ]
             );
             
-        $this->userRepository->expects($this->once())
-            ->method('findOneBy')
-            ->with([
-                'userId' => 'user-123',
-                'corp' => $corp,
-            ])
+        $this->userLoader->expects($this->once())
+            ->method('loadUserByUserIdAndCorp')
+            ->with('user-123', $corp)
             ->willReturn(null);
             
         $this->bizUserService->expects($this->once())
@@ -234,9 +232,14 @@ class GetWechatWorkUserByAuthCodeTest extends TestCase
     
     public function testGetResult_UpdatesExistingUser(): void
     {
+        /** @var Corp&MockObject $corp */
         $corp = $this->createMock(Corp::class);
+        /** @var Agent&MockObject $agent */
         $agent = $this->createMock(Agent::class);
-        $existingUser = $this->createMock(User::class);
+        $existingUser = new User();
+        $existingUser->setCorp($corp);
+        $existingUser->setAgent($agent);
+        $existingUser->setUserId('user-123');
         $bizUser = $this->createMock(\Symfony\Component\Security\Core\User\UserInterface::class);
         
         $this->corpRepository->expects($this->once())
@@ -268,29 +271,10 @@ class GetWechatWorkUserByAuthCodeTest extends TestCase
                 ]
             );
             
-        $this->userRepository->expects($this->once())
-            ->method('findOneBy')
-            ->with([
-                'userId' => 'user-123',
-                'corp' => $corp,
-            ])
+        $this->userLoader->expects($this->once())
+            ->method('loadUserByUserIdAndCorp')
+            ->with('user-123', $corp)
             ->willReturn($existingUser);
-            
-        $existingUser->expects($this->once())
-            ->method('setName')
-            ->with('Updated User');
-            
-        $existingUser->expects($this->once())
-            ->method('setAvatarUrl')
-            ->with('http://example.com/avatar.jpg');
-            
-        $existingUser->expects($this->once())
-            ->method('setEmail')
-            ->with('test@example.com');
-            
-        $existingUser->expects($this->once())
-            ->method('setMobile')
-            ->with('13800138000');
             
         $this->bizUserService->expects($this->once())
             ->method('transformFromWorkUser')
@@ -308,7 +292,14 @@ class GetWechatWorkUserByAuthCodeTest extends TestCase
             
         $this->entityManager->expects($this->once())
             ->method('persist')
-            ->with($existingUser);
+            ->with($this->callback(function ($user) use ($existingUser) {
+                $this->assertSame($existingUser, $user);
+                $this->assertEquals('Updated User', $user->getName());
+                $this->assertEquals('http://example.com/avatar.jpg', $user->getAvatarUrl());
+                $this->assertEquals('test@example.com', $user->getEmail());
+                $this->assertEquals('13800138000', $user->getMobile());
+                return true;
+            }));
             
         $this->entityManager->expects($this->once())
             ->method('flush');
