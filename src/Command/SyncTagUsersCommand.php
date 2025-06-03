@@ -9,10 +9,10 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Tourze\Symfony\CronJob\Attribute\AsCronTask;
+use Tourze\WechatWorkContracts\UserLoaderInterface;
 use WechatWorkBundle\Repository\AgentRepository;
 use WechatWorkBundle\Service\WorkService;
 use WechatWorkStaffBundle\Entity\User;
-use WechatWorkStaffBundle\Repository\UserRepository;
 use WechatWorkStaffBundle\Repository\UserTagRepository;
 use WechatWorkStaffBundle\Request\User\GetTagUsersRequest;
 
@@ -23,7 +23,7 @@ class SyncTagUsersCommand extends Command
     public function __construct(
         private readonly AgentRepository $agentRepository,
         private readonly UserTagRepository $userTagRepository,
-        private readonly UserRepository $userRepository,
+        private readonly UserLoaderInterface $userLoader,
         private readonly WorkService $workService,
         private readonly EntityManagerInterface $entityManager,
     ) {
@@ -48,10 +48,7 @@ class SyncTagUsersCommand extends Command
                 if (isset($response['userlist'])) {
                     $users = new ArrayCollection();
                     foreach ($response['userlist'] as $item) {
-                        $user = $this->userRepository->findOneBy([
-                            'corp' => $agent->getCorp(),
-                            'userId' => $item['userid'],
-                        ]);
+                        $user = $this->userLoader->loadUserByUserIdAndCorp($item['userid'], $agent->getCorp());
                         if (!$user) {
                             $user = new User();
                             $user->setCorp($agent->getCorp());

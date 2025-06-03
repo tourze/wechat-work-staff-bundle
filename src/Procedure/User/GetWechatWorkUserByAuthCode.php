@@ -14,11 +14,11 @@ use Tourze\JsonRPC\Core\Attribute\MethodParam;
 use Tourze\JsonRPC\Core\Attribute\MethodTag;
 use Tourze\JsonRPCLockBundle\Procedure\LockableProcedure;
 use Tourze\JsonRPCLogBundle\Attribute\Log;
+use Tourze\WechatWorkContracts\UserLoaderInterface;
 use WechatWorkBundle\Repository\AgentRepository;
 use WechatWorkBundle\Repository\CorpRepository;
 use WechatWorkBundle\Service\WorkService;
 use WechatWorkStaffBundle\Entity\User;
-use WechatWorkStaffBundle\Repository\UserRepository;
 use WechatWorkStaffBundle\Request\Auth\GetUserDetailByTicketRequest;
 use WechatWorkStaffBundle\Request\Auth\GetUserInfoByCodeRequest;
 use WechatWorkStaffBundle\Request\User\GetUserRequest;
@@ -43,7 +43,7 @@ class GetWechatWorkUserByAuthCode extends LockableProcedure
     public function __construct(
         private readonly CorpRepository $corpRepository,
         private readonly AgentRepository $agentRepository,
-        private readonly UserRepository $userRepository,
+        private readonly UserLoaderInterface $userLoader,
         private readonly BizUserService $bizUserService,
         private readonly AccessTokenService $accessTokenService,
         private readonly WorkService $workService,
@@ -105,10 +105,7 @@ class GetWechatWorkUserByAuthCode extends LockableProcedure
         }
 
         // 保存企微用户信息
-        $workUser = $this->userRepository->findOneBy([
-            'userId' => $result['userid'],
-            'corp' => $corp,
-        ]);
+        $workUser = $this->userLoader->loadUserByUserIdAndCorp($result['userid'], $corp);
         if (!$workUser) {
             $workUser = new User();
             $workUser->setCorp($corp);

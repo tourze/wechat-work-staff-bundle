@@ -4,8 +4,10 @@ namespace WechatWorkStaffBundle\Repository;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
-use Tourze\WechatWorkStaffModel\UserInterface;
-use Tourze\WechatWorkStaffModel\UserLoaderInterface;
+use Symfony\Component\DependencyInjection\Attribute\AsAlias;
+use Tourze\WechatWorkContracts\CorpInterface;
+use Tourze\WechatWorkContracts\UserInterface;
+use Tourze\WechatWorkContracts\UserLoaderInterface;
 use WechatWorkStaffBundle\Entity\User;
 
 /**
@@ -14,6 +16,7 @@ use WechatWorkStaffBundle\Entity\User;
  * @method User[]    findAll()
  * @method User[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
+#[AsAlias(UserLoaderInterface::class)]
 class UserRepository extends ServiceEntityRepository implements UserLoaderInterface
 {
     public function __construct(ManagerRegistry $registry)
@@ -21,8 +24,8 @@ class UserRepository extends ServiceEntityRepository implements UserLoaderInterf
         parent::__construct($registry, User::class);
     }
 
-    public function loadUserByUserId(string $userId): ?UserInterface
+    public function loadUserByUserIdAndCorp(string $userId, CorpInterface $corp): ?UserInterface
     {
-        return $this->findOneBy(['userId' => $userId]);
+        return $this->findOneBy(['userId' => $userId, 'corp' => $corp]);
     }
 }

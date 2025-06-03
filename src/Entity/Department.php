@@ -24,7 +24,7 @@ use Tourze\EasyAdmin\Attribute\Column\TreeView;
 use Tourze\EasyAdmin\Attribute\Field\FormField;
 use Tourze\EasyAdmin\Attribute\Filter\Filterable;
 use Tourze\EasyAdmin\Attribute\Permission\AsPermission;
-use Tourze\WechatWorkStaffModel\DepartmentInterface;
+use Tourze\WechatWorkContracts\DepartmentInterface;
 use WechatWorkBundle\Entity\Agent;
 use WechatWorkBundle\Entity\Corp;
 use WechatWorkStaffBundle\Repository\DepartmentRepository;

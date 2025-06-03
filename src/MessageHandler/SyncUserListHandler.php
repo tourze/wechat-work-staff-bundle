@@ -7,12 +7,12 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Tourze\WechatWorkContracts\UserLoaderInterface;
 use WechatWorkBundle\Repository\AgentRepository;
 use WechatWorkBundle\Service\WorkService;
 use WechatWorkStaffBundle\Entity\User;
 use WechatWorkStaffBundle\Message\SyncUserListMessage;
 use WechatWorkStaffBundle\Repository\DepartmentRepository;
-use WechatWorkStaffBundle\Repository\UserRepository;
 use WechatWorkStaffBundle\Request\User\ListIdRequest;
 use WechatWorkStaffBundle\Service\BizUserService;
 
@@ -22,7 +22,7 @@ class SyncUserListHandler
     public function __construct(
         #[Autowire(service: 'wechat-work-staff-bundle.property-accessor')] private readonly PropertyAccessor $propertyAccessor,
         private readonly AgentRepository $agentRepository,
-        private readonly UserRepository $userRepository,
+        private readonly UserLoaderInterface $userLoader,
         private readonly DepartmentRepository $departmentRepository,
         private readonly BizUserService $bizUserService,
         private readonly WorkService $workService,
@@ -59,10 +59,7 @@ class SyncUserListHandler
             }
 
             foreach ($list['dept_user'] as $item) {
-                $user = $this->userRepository->findOneBy([
-                    'userId' => $item['open_userid'],
-                    'corp' => $agent->getCorp(),
-                ]);
+                $user = $this->userLoader->loadUserByUserIdAndCorp($item['open_userid'], $agent->getCorp());
                 if (!$user) {
                     $user = new User();
                     $user->setUserId($item['open_userid']);
