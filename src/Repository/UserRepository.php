@@ -5,6 +5,7 @@ namespace WechatWorkStaffBundle\Repository;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\DependencyInjection\Attribute\AsAlias;
+use Tourze\WechatWorkContracts\AgentInterface;
 use Tourze\WechatWorkContracts\CorpInterface;
 use Tourze\WechatWorkContracts\UserInterface;
 use Tourze\WechatWorkContracts\UserLoaderInterface;
@@ -27,5 +28,17 @@ class UserRepository extends ServiceEntityRepository implements UserLoaderInterf
     public function loadUserByUserIdAndCorp(string $userId, CorpInterface $corp): ?UserInterface
     {
         return $this->findOneBy(['userId' => $userId, 'corp' => $corp]);
+    }
+
+    public function createUser(CorpInterface $corp, AgentInterface $agent, string $userId, string $name): UserInterface
+    {
+        $user = new User();
+        $user->setCorp($corp);
+        $user->setAgent($agent);
+        $user->setUserId($userId);
+        $user->setName($name);
+        $this->getEntityManager()->persist($user);
+        $this->getEntityManager()->flush();
+        return $user;
     }
 }

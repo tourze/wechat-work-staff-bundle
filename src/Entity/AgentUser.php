@@ -14,7 +14,7 @@ use Tourze\EasyAdmin\Attribute\Action\Deletable;
 use Tourze\EasyAdmin\Attribute\Column\ExportColumn;
 use Tourze\EasyAdmin\Attribute\Column\ListColumn;
 use Tourze\EasyAdmin\Attribute\Filter\Filterable;
-use WechatWorkBundle\Entity\Agent;
+use Tourze\WechatWorkContracts\AgentInterface;
 use WechatWorkStaffBundle\Repository\AgentUserRepository;
 
 /**
@@ -37,9 +37,9 @@ class AgentUser
     #[ORM\Column(type: Types::BIGINT, nullable: false, options: ['comment' => 'ID'])]
     private ?string $id = null;
 
-    #[ORM\ManyToOne(targetEntity: Agent::class)]
+    #[ORM\ManyToOne(targetEntity: AgentInterface::class)]
     #[ORM\JoinColumn(nullable: true)]
-    private ?Agent $agent = null;
+    private ?AgentInterface $agent = null;
 
     #[ORM\Column(type: Types::STRING, length: 120, options: ['comment' => '企业用户ID'])]
     private ?string $userId = null;
@@ -75,12 +75,12 @@ class AgentUser
         return $this->id;
     }
 
-    public function getAgent(): ?Agent
+    public function getAgent(): ?AgentInterface
     {
         return $this->agent;
     }
 
-    public function setAgent(?Agent $agent): self
+    public function setAgent(?AgentInterface $agent): self
     {
         $this->agent = $agent;
 

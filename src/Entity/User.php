@@ -23,9 +23,9 @@ use Tourze\EasyAdmin\Attribute\Column\ListColumn;
 use Tourze\EasyAdmin\Attribute\Field\FormField;
 use Tourze\EasyAdmin\Attribute\Filter\Filterable;
 use Tourze\EasyAdmin\Attribute\Permission\AsPermission;
+use Tourze\WechatWorkContracts\AgentInterface;
+use Tourze\WechatWorkContracts\CorpInterface;
 use Tourze\WechatWorkContracts\UserInterface;
-use WechatWorkBundle\Entity\Agent;
-use WechatWorkBundle\Entity\Corp;
 use WechatWorkStaffBundle\Repository\UserRepository;
 
 #[AsPermission(title: '成员信息')]
@@ -45,12 +45,12 @@ class User implements \Stringable, UserInterface
     #[ORM\Column(type: Types::INTEGER, options: ['comment' => 'ID'])]
     private ?int $id = 0;
 
-    #[ORM\ManyToOne(targetEntity: Corp::class)]
+    #[ORM\ManyToOne(targetEntity: CorpInterface::class)]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Corp $corp = null;
+    private ?CorpInterface $corp = null;
 
-    #[ORM\ManyToOne(targetEntity: Agent::class)]
-    private ?Agent $agent = null;
+    #[ORM\ManyToOne(targetEntity: AgentInterface::class)]
+    private ?AgentInterface $agent = null;
 
     /**
      * 对应管理端的帐号，企业内必须唯一。
@@ -172,24 +172,24 @@ class User implements \Stringable, UserInterface
         return $this->id;
     }
 
-    public function getCorp(): ?Corp
+    public function getCorp(): ?CorpInterface
     {
         return $this->corp;
     }
 
-    public function setCorp(?Corp $corp): self
+    public function setCorp(?CorpInterface $corp): self
     {
         $this->corp = $corp;
 
         return $this;
     }
 
-    public function getAgent(): ?Agent
+    public function getAgent(): ?AgentInterface
     {
         return $this->agent;
     }
 
-    public function setAgent(?Agent $agent): self
+    public function setAgent(?AgentInterface $agent): self
     {
         $this->agent = $agent;
 

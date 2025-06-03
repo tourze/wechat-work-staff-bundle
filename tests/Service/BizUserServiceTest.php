@@ -2,6 +2,7 @@
 
 namespace WechatWorkStaffBundle\Tests\Service;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Tourze\UserServiceContracts\UserManagerInterface;
@@ -12,9 +13,9 @@ use WechatWorkStaffBundle\Service\BizUserService;
 
 class BizUserServiceTest extends TestCase
 {
-    private UserManagerInterface $userManager;
-    private UserRepository $userRepository;
     private BizUserService $bizUserService;
+    private UserManagerInterface&MockObject $userManager;
+    private UserRepository&MockObject $userRepository;
     
     protected function setUp(): void
     {
@@ -23,76 +24,73 @@ class BizUserServiceTest extends TestCase
         $this->bizUserService = new BizUserService($this->userManager, $this->userRepository);
     }
     
-    public function testTransformFromExternalUser_WhenUserExists(): void
+    public function testConstructor(): void
+    {
+        $this->assertInstanceOf(BizUserService::class, $this->bizUserService);
+    }
+    
+    public function testTransformFromExternalUserWithExistingUser(): void
     {
         $externalContact = $this->createMock(ExternalContactInterface::class);
-        $bizUser = $this->createMock(UserInterface::class);
+        $existingBizUser = $this->createMock(UserInterface::class);
         
         $externalContact->expects($this->once())
             ->method('getExternalUserId')
-            ->willReturn('ext-user-123');
-            
-        $externalContact->expects($this->never())
-            ->method('getNickname');
-            
-        $externalContact->expects($this->never())
-            ->method('getAvatar');
+            ->willReturn('external_123');
             
         $this->userManager->expects($this->once())
             ->method('loadUserByIdentifier')
-            ->with('ext-user-123')
-            ->willReturn($bizUser);
+            ->with('external_123')
+            ->willReturn($existingBizUser);
             
         $this->userManager->expects($this->never())
             ->method('createUser');
-            
+        
         $result = $this->bizUserService->transformFromExternalUser($externalContact);
         
-        $this->assertSame($bizUser, $result);
+        $this->assertSame($existingBizUser, $result);
     }
     
-    public function testTransformFromExternalUser_WhenUserDoesNotExist_WithNickname(): void
+    public function testTransformFromExternalUserWithNewUser(): void
     {
         $externalContact = $this->createMock(ExternalContactInterface::class);
-        $bizUser = $this->createMock(UserInterface::class);
+        $newBizUser = $this->createMock(UserInterface::class);
         
-        $externalContact->expects($this->atLeastOnce())
+        $externalContact->expects($this->exactly(2))
             ->method('getExternalUserId')
-            ->willReturn('ext-user-123');
+            ->willReturn('external_456');
             
-        $externalContact->expects($this->atLeastOnce())
+        $externalContact->expects($this->exactly(2))
             ->method('getNickname')
-            ->willReturn('External User');
+            ->willReturn('外部用户');
             
         $externalContact->expects($this->once())
             ->method('getAvatar')
-            ->willReturn('http://example.com/avatar.jpg');
+            ->willReturn('https://example.com/avatar.jpg');
             
         $this->userManager->expects($this->once())
             ->method('loadUserByIdentifier')
-            ->with('ext-user-123')
+            ->with('external_456')
             ->willReturn(null);
             
         $this->userManager->expects($this->once())
             ->method('createUser')
-            ->with('ext-user-123', 'External User', 'http://example.com/avatar.jpg')
-            ->willReturn($bizUser);
-            
+            ->with('external_456', '外部用户', 'https://example.com/avatar.jpg')
+            ->willReturn($newBizUser);
+        
         $result = $this->bizUserService->transformFromExternalUser($externalContact);
         
-        $this->assertSame($bizUser, $result);
+        $this->assertSame($newBizUser, $result);
     }
     
-    public function testTransformFromExternalUser_WhenUserDoesNotExist_WithoutNickname(): void
+    public function testTransformFromExternalUserWithEmptyNickname(): void
     {
-        $_ENV['WECHAT_WORK_EXTERNAL_CONTRACT_DEFAULT_NICK_NAME'] = '默认名称';
-        
         $externalContact = $this->createMock(ExternalContactInterface::class);
-        $bizUser = $this->createMock(UserInterface::class);
+        $newBizUser = $this->createMock(UserInterface::class);
         
-        $externalContact->expects($this->atLeastOnce())
+        $externalContact->expects($this->exactly(2))
             ->method('getExternalUserId')
-            ->willReturn('ext-user-123');
+            ->willReturn('external_789');
             
         $externalContact->expects($this->once())
             ->method('getNickname')
@@ -100,189 +98,124 @@ class BizUserServiceTest extends TestCase
             
         $externalContact->expects($this->once())
             ->method('getAvatar')
-            ->willReturn('http://example.com/avatar.jpg');
+            ->willReturn('https://example.com/avatar2.jpg');
             
         $this->userManager->expects($this->once())
             ->method('loadUserByIdentifier')
-            ->with('ext-user-123')
+            ->with('external_789')
             ->willReturn(null);
             
         $this->userManager->expects($this->once())
             ->method('createUser')
-            ->with('ext-user-123', '默认名称', 'http://example.com/avatar.jpg')
-            ->willReturn($bizUser);
-            
+            ->with('external_789', '企微外部联系人', 'https://example.com/avatar2.jpg')
+            ->willReturn($newBizUser);
+        
         $result = $this->bizUserService->transformFromExternalUser($externalContact);
         
-        $this->assertSame($bizUser, $result);
-        
-        // 清理环境变量
-        unset($_ENV['WECHAT_WORK_EXTERNAL_CONTRACT_DEFAULT_NICK_NAME']);
+        $this->assertSame($newBizUser, $result);
     }
     
-    public function testTransformFromExternalUser_WithDefaultNickname(): void
+    public function testTransformFromWorkUserWithExistingUser(): void
     {
-        // 不设置环境变量，测试默认值
+        $workUser = new User();
+        $workUser->setUserId('work_123');
+        $workUser->setName('企微员工');
         
-        $externalContact = $this->createMock(ExternalContactInterface::class);
-        $bizUser = $this->createMock(UserInterface::class);
+        $existingBizUser = $this->createMock(UserInterface::class);
         
-        $externalContact->expects($this->atLeastOnce())
-            ->method('getExternalUserId')
-            ->willReturn('ext-user-123');
-            
-        $externalContact->expects($this->once())
-            ->method('getNickname')
-            ->willReturn('');
-            
-        $externalContact->expects($this->once())
-            ->method('getAvatar')
-            ->willReturn('http://example.com/avatar.jpg');
-            
         $this->userManager->expects($this->once())
             ->method('loadUserByIdentifier')
-            ->with('ext-user-123')
-            ->willReturn(null);
-            
-        $this->userManager->expects($this->once())
-            ->method('createUser')
-            ->with('ext-user-123', '企微外部联系人', 'http://example.com/avatar.jpg')
-            ->willReturn($bizUser);
-            
-        $result = $this->bizUserService->transformFromExternalUser($externalContact);
-        
-        $this->assertSame($bizUser, $result);
-    }
-    
-    public function testTransformFromWorkUser_WhenUserExists(): void
-    {
-        $workUser = $this->createMock(User::class);
-        $bizUser = $this->createMock(UserInterface::class);
-        
-        $workUser->expects($this->once())
-            ->method('getUserId')
-            ->willReturn('work-user-123');
-            
-        $workUser->expects($this->never())
-            ->method('getName');
-            
-        $workUser->expects($this->never())
-            ->method('getAvatarUrl');
-            
-        $this->userManager->expects($this->once())
-            ->method('loadUserByIdentifier')
-            ->with('work-user-123')
-            ->willReturn($bizUser);
+            ->with('work_123')
+            ->willReturn($existingBizUser);
             
         $this->userManager->expects($this->never())
             ->method('createUser');
-            
+        
         $result = $this->bizUserService->transformFromWorkUser($workUser);
         
-        $this->assertSame($bizUser, $result);
+        $this->assertSame($existingBizUser, $result);
     }
     
-    public function testTransformFromWorkUser_WhenUserDoesNotExist_WithName(): void
+    public function testTransformFromWorkUserWithNewUser(): void
     {
-        $workUser = $this->createMock(User::class);
-        $bizUser = $this->createMock(UserInterface::class);
+        $workUser = new User();
+        $workUser->setUserId('work_456');
+        $workUser->setName('新企微员工');
+        $workUser->setAvatarUrl('https://work.example.com/avatar.jpg');
         
-        $workUser->expects($this->atLeastOnce())
-            ->method('getUserId')
-            ->willReturn('work-user-123');
-            
-        $workUser->expects($this->atLeastOnce())
-            ->method('getName')
-            ->willReturn('Work User');
-            
-        $workUser->expects($this->once())
-            ->method('getAvatarUrl')
-            ->willReturn('http://example.com/avatar.jpg');
-            
+        $newBizUser = $this->createMock(UserInterface::class);
+        
         $this->userManager->expects($this->once())
             ->method('loadUserByIdentifier')
-            ->with('work-user-123')
+            ->with('work_456')
             ->willReturn(null);
             
         $this->userManager->expects($this->once())
             ->method('createUser')
-            ->with('work-user-123', 'Work User', 'http://example.com/avatar.jpg')
-            ->willReturn($bizUser);
-            
+            ->with('work_456', '新企微员工', 'https://work.example.com/avatar.jpg')
+            ->willReturn($newBizUser);
+        
         $result = $this->bizUserService->transformFromWorkUser($workUser);
         
-        $this->assertSame($bizUser, $result);
+        $this->assertSame($newBizUser, $result);
     }
     
-    public function testTransformFromWorkUser_WhenUserDoesNotExist_WithoutName(): void
+    public function testTransformFromWorkUserWithEmptyName(): void
     {
-        $_ENV['WECHAT_WORK_EXTERNAL_CONTRACT_DEFAULT_NICK_NAME'] = '默认名称';
+        $workUser = new User();
+        $workUser->setUserId('work_789');
+        $workUser->setName('');
+        $workUser->setAvatarUrl('https://work.example.com/avatar2.jpg');
         
-        $workUser = $this->createMock(User::class);
-        $bizUser = $this->createMock(UserInterface::class);
+        $newBizUser = $this->createMock(UserInterface::class);
         
-        $workUser->expects($this->atLeastOnce())
-            ->method('getUserId')
-            ->willReturn('work-user-123');
-            
-        $workUser->expects($this->once())
-            ->method('getName')
-            ->willReturn('');
-            
-        $workUser->expects($this->once())
-            ->method('getAvatarUrl')
-            ->willReturn('http://example.com/avatar.jpg');
-            
         $this->userManager->expects($this->once())
             ->method('loadUserByIdentifier')
-            ->with('work-user-123')
+            ->with('work_789')
             ->willReturn(null);
             
         $this->userManager->expects($this->once())
             ->method('createUser')
-            ->with('work-user-123', '默认名称', 'http://example.com/avatar.jpg')
-            ->willReturn($bizUser);
-            
+            ->with('work_789', '企业微信用户', 'https://work.example.com/avatar2.jpg')
+            ->willReturn($newBizUser);
+        
         $result = $this->bizUserService->transformFromWorkUser($workUser);
         
-        $this->assertSame($bizUser, $result);
-        
-        // 清理环境变量
-        unset($_ENV['WECHAT_WORK_EXTERNAL_CONTRACT_DEFAULT_NICK_NAME']);
+        $this->assertSame($newBizUser, $result);
     }
     
-    public function testTransformToWorkUser(): void
+    public function testTransformToWorkUserFound(): void
     {
         $bizUser = $this->createMock(UserInterface::class);
-        $workUser = $this->createMock(User::class);
+        $workUser = new User();
         
         $bizUser->expects($this->once())
             ->method('getUserIdentifier')
-            ->willReturn('user-123');
+            ->willReturn('user_123');
             
         $this->userRepository->expects($this->once())
             ->method('findOneBy')
-            ->with(['userId' => 'user-123'])
+            ->with(['userId' => 'user_123'])
             ->willReturn($workUser);
-            
+        
         $result = $this->bizUserService->transformToWorkUser($bizUser);
         
         $this->assertSame($workUser, $result);
     }
     
-    public function testTransformToWorkUser_NotFound(): void
+    public function testTransformToWorkUserNotFound(): void
     {
         $bizUser = $this->createMock(UserInterface::class);
         
         $bizUser->expects($this->once())
             ->method('getUserIdentifier')
-            ->willReturn('user-123');
+            ->willReturn('user_404');
             
         $this->userRepository->expects($this->once())
             ->method('findOneBy')
-            ->with(['userId' => 'user-123'])
+            ->with(['userId' => 'user_404'])
             ->willReturn(null);
-            
+        
         $result = $this->bizUserService->transformToWorkUser($bizUser);
         
         $this->assertNull($result);

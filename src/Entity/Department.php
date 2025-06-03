@@ -24,9 +24,9 @@ use Tourze\EasyAdmin\Attribute\Column\TreeView;
 use Tourze\EasyAdmin\Attribute\Field\FormField;
 use Tourze\EasyAdmin\Attribute\Filter\Filterable;
 use Tourze\EasyAdmin\Attribute\Permission\AsPermission;
+use Tourze\WechatWorkContracts\AgentInterface;
+use Tourze\WechatWorkContracts\CorpInterface;
 use Tourze\WechatWorkContracts\DepartmentInterface;
-use WechatWorkBundle\Entity\Agent;
-use WechatWorkBundle\Entity\Corp;
 use WechatWorkStaffBundle\Repository\DepartmentRepository;
 
 #[AsPermission(title: '部门信息')]
@@ -56,12 +56,12 @@ class Department implements \Stringable, DepartmentInterface
 
     #[FormField(title: '所属公司')]
     #[ListColumn(title: '所属公司')]
-    #[ORM\ManyToOne(targetEntity: Corp::class)]
-    private ?Corp $corp = null;
+    #[ORM\ManyToOne(targetEntity: CorpInterface::class)]
+    private ?CorpInterface $corp = null;
 
-    #[ORM\ManyToOne(targetEntity: Agent::class)]
+    #[ORM\ManyToOne(targetEntity: AgentInterface::class)]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Agent $agent = null;
+    private ?AgentInterface $agent = null;
 
     #[IndexColumn]
     #[TrackColumn]
@@ -267,24 +267,24 @@ class Department implements \Stringable, DepartmentInterface
         return $this;
     }
 
-    public function getCorp(): ?Corp
+    public function getCorp(): ?CorpInterface
     {
         return $this->corp;
     }
 
-    public function setCorp(?Corp $corp): self
+    public function setCorp(?CorpInterface $corp): self
     {
         $this->corp = $corp;
 
         return $this;
     }
 
-    public function getAgent(): ?Agent
+    public function getAgent(): ?AgentInterface
     {
         return $this->agent;
     }
 
-    public function setAgent(?Agent $agent): self
+    public function setAgent(?AgentInterface $agent): self
     {
         $this->agent = $agent;
 
