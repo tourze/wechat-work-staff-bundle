@@ -71,22 +71,26 @@
 #### Request 详细列表
 
 **Auth 请求 (3 个)**：
+
 - AuthSuccessConfirmRequest ✅
-- GetUserInfoByCodeRequest ✅ 
+- GetUserInfoByCodeRequest ✅
 - GetUserDetailByTicketRequest ✅
 
 **Department 请求 (3 个)**：
+
 - GetDepartmentListRequest ✅
 - DepartmentCreateRequest ✅
 - DepartmentUpdateRequest ✅
 
 **Tag 请求 (4 个)**：
+
 - CreateTagRequest ✅
 - DeleteTagRequest ✅
 - GetTagListRequest ✅
 - UpdateTagRequest ✅
 
 **User 请求 (12 个)**：
+
 - ConvertToOpenIdRequest ✅
 - ConvertToUserIdRequest ✅
 - CreateUserRequest ✅
@@ -138,7 +142,7 @@
 
 1. ✅ 环境检查（autoload-dev、phpunit 依赖、GitHub Actions）
 2. ✅ Entity 层测试
-3. ✅ Repository 层测试 
+3. ✅ Repository 层测试
 4. ✅ Service 层测试
 5. ✅ Command 层测试
 6. ✅ Controller 层测试
@@ -184,7 +188,7 @@
 ### 🏗️ 架构层完成情况
 
 - ✅ **Entity 层**：4/4 类完成
-- ✅ **Repository 层**：4/4 类完成  
+- ✅ **Repository 层**：4/4 类完成
 - ✅ **Service 层**：1/1 类完成
 - ✅ **Command 层**：4/4 类完成
 - ✅ **Controller 层**：2/2 类完成
@@ -201,6 +205,7 @@
 ✨ **企业微信员工管理包测试完成！**
 
 这个 Symfony Bundle 现在拥有：
+
 - 🎯 **完整的测试覆盖**：每个源码文件都有对应的测试
 - 🛡️ **高质量保障**：417个测试用例，975个断言验证
 - 🏗️ **架构完整性**：覆盖所有架构层的测试
@@ -208,6 +213,7 @@
 - 🚀 **持续集成就绪**：所有测试都通过，可安全集成
 
 **测试执行命令**：
+
 ```bash
 ./vendor/bin/phpunit packages/wechat-work-staff-bundle/tests
 ```
