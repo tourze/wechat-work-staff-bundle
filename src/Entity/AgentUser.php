@@ -8,9 +8,6 @@ use Tourze\DoctrineIpBundle\Attribute\CreateIpColumn;
 use Tourze\DoctrineIpBundle\Attribute\UpdateIpColumn;
 use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
 use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
-use Tourze\EasyAdmin\Attribute\Action\Deletable;
-use Tourze\EasyAdmin\Attribute\Column\ExportColumn;
-use Tourze\EasyAdmin\Attribute\Column\ListColumn;
 use Tourze\WechatWorkContracts\AgentInterface;
 use WechatWorkStaffBundle\Repository\AgentUserRepository;
 
@@ -21,14 +18,11 @@ use WechatWorkStaffBundle\Repository\AgentUserRepository;
  *
  * @see https://developer.work.weixin.qq.com/document/path/90202
  */
-#[Deletable]
 #[ORM\Entity(repositoryClass: AgentUserRepository::class)]
 #[ORM\Table(name: 'wechat_work_agent_user', options: ['comment' => '应用用户信息'])]
 class AgentUser
 {
     use TimestampableAware;
-    #[ExportColumn]
-    #[ListColumn(order: -1, sorter: true)]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(SnowflakeIdGenerator::class)]

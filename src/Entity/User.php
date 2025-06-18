@@ -12,33 +12,20 @@ use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
 use Tourze\DoctrineTrackBundle\Attribute\TrackColumn;
 use Tourze\DoctrineUserBundle\Attribute\CreatedByColumn;
 use Tourze\DoctrineUserBundle\Attribute\UpdatedByColumn;
-use Tourze\EasyAdmin\Attribute\Action\Creatable;
-use Tourze\EasyAdmin\Attribute\Action\Deletable;
-use Tourze\EasyAdmin\Attribute\Action\Editable;
 use Tourze\EasyAdmin\Attribute\Action\Listable;
-use Tourze\EasyAdmin\Attribute\Column\ExportColumn;
-use Tourze\EasyAdmin\Attribute\Column\ListColumn;
-use Tourze\EasyAdmin\Attribute\Field\FormField;
 use Tourze\EasyAdmin\Attribute\Filter\Filterable;
-use Tourze\EasyAdmin\Attribute\Permission\AsPermission;
 use Tourze\WechatWorkContracts\AgentInterface;
 use Tourze\WechatWorkContracts\CorpInterface;
 use Tourze\WechatWorkContracts\UserInterface;
 use WechatWorkStaffBundle\Repository\UserRepository;
 
-#[AsPermission(title: '成员信息')]
 #[Listable]
-#[Deletable]
-#[Editable]
-#[Creatable]
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: 'wechat_work_user', options: ['comment' => '成员信息'])]
 #[ORM\UniqueConstraint(name: 'wechat_work_user_idx_uniq', columns: ['user_id', 'corp_id'])]
 class User implements \Stringable, UserInterface
 {
     use TimestampableAware;
-    #[ListColumn(order: -1)]
-    #[ExportColumn]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: Types::INTEGER, options: ['comment' => 'ID'])]
@@ -56,26 +43,18 @@ class User implements \Stringable, UserInterface
      * 长度为1~64个字节。只能由数字、字母和“_-@.”四种字符组成，且第一个字符必须是数字或字母。系统进行唯一性检查时会忽略大小写。
      */
     #[TrackColumn]
-    #[FormField]
-    #[ListColumn]
     #[ORM\Column(type: Types::STRING, length: 128, options: ['comment' => '成员UserID'])]
     private ?string $userId = null;
 
     #[TrackColumn]
-    #[FormField]
-    #[ListColumn]
     #[ORM\Column(type: Types::STRING, length: 128, options: ['comment' => '成员名称'])]
     private ?string $name = null;
 
     #[TrackColumn]
-    #[FormField]
-    #[ListColumn]
     #[ORM\Column(type: Types::STRING, length: 255, nullable: true, options: ['comment' => '成员别名'])]
     private ?string $alias = null;
 
     #[TrackColumn]
-    #[FormField]
-    #[ListColumn]
     #[ORM\Column(type: Types::STRING, length: 64, nullable: true, options: ['comment' => '职务'])]
     private ?string $position = null;
 
@@ -83,8 +62,6 @@ class User implements \Stringable, UserInterface
      * 企业内必须唯一，mobile/email二者不能同时为空.
      */
     #[TrackColumn]
-    #[FormField]
-    #[ListColumn]
     #[ORM\Column(type: Types::STRING, length: 40, nullable: true, options: ['comment' => '手机号码'])]
     private ?string $mobile = null;
 
@@ -92,17 +69,13 @@ class User implements \Stringable, UserInterface
      * 长度6~64个字节，且为有效的email格式。企业内必须唯一，mobile/email二者不能同时为空.
      */
     #[TrackColumn]
-    #[FormField]
-    #[ListColumn]
     #[ORM\Column(type: Types::STRING, length: 255, nullable: true, options: ['comment' => '邮箱'])]
     private ?string $email = null;
 
     /**
      * @var Collection<Department>
      */
-    #[FormField(title: '所属部门')]
     #[Filterable(label: '所属部门')]
-    #[ListColumn(title: '所属部门')]
     #[ORM\ManyToMany(targetEntity: Department::class, mappedBy: 'users', fetch: 'EXTRA_LAZY')]
     private Collection $departments;
 

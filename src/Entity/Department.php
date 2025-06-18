@@ -13,26 +13,14 @@ use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
 use Tourze\DoctrineTrackBundle\Attribute\TrackColumn;
 use Tourze\DoctrineUserBundle\Attribute\CreatedByColumn;
 use Tourze\DoctrineUserBundle\Attribute\UpdatedByColumn;
-use Tourze\EasyAdmin\Attribute\Action\Creatable;
-use Tourze\EasyAdmin\Attribute\Action\Deletable;
-use Tourze\EasyAdmin\Attribute\Action\Editable;
 use Tourze\EasyAdmin\Attribute\Action\Listable;
-use Tourze\EasyAdmin\Attribute\Column\ExportColumn;
-use Tourze\EasyAdmin\Attribute\Column\ListColumn;
 use Tourze\EasyAdmin\Attribute\Column\TreeView;
-use Tourze\EasyAdmin\Attribute\Field\FormField;
-use Tourze\EasyAdmin\Attribute\Filter\Filterable;
-use Tourze\EasyAdmin\Attribute\Permission\AsPermission;
 use Tourze\WechatWorkContracts\AgentInterface;
 use Tourze\WechatWorkContracts\CorpInterface;
 use Tourze\WechatWorkContracts\DepartmentInterface;
 use WechatWorkStaffBundle\Repository\DepartmentRepository;
 
-#[AsPermission(title: '部门信息')]
 #[Listable]
-#[Deletable]
-#[Editable]
-#[Creatable]
 #[TreeView(dataModel: Department::class, targetAttribute: 'parent')]
 #[ORM\Entity(repositoryClass: DepartmentRepository::class)]
 #[ORM\Table(name: 'wechat_work_department', options: ['comment' => '部门信息'])]
@@ -40,22 +28,15 @@ use WechatWorkStaffBundle\Repository\DepartmentRepository;
 class Department implements \Stringable, DepartmentInterface
 {
     use TimestampableAware;
-    #[ListColumn(order: -1)]
-    #[ExportColumn]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: Types::INTEGER, options: ['comment' => 'ID'])]
     private ?int $id = 0;
 
     #[TrackColumn]
-    #[FormField]
-    #[Filterable]
-    #[ListColumn]
     #[ORM\Column(type: Types::INTEGER, nullable: true, options: ['comment' => '远程ID'])]
     private ?int $remoteId = null;
 
-    #[FormField(title: '所属公司')]
-    #[ListColumn(title: '所属公司')]
     #[ORM\ManyToOne(targetEntity: CorpInterface::class)]
     private ?CorpInterface $corp = null;
 
@@ -65,15 +46,10 @@ class Department implements \Stringable, DepartmentInterface
 
     #[IndexColumn]
     #[TrackColumn]
-    #[FormField(span: 12)]
-    #[Filterable]
-    #[ListColumn]
     #[ORM\Column(type: Types::STRING, length: 120, options: ['comment' => '部门名称'])]
     private ?string $name = null;
 
     #[TrackColumn]
-    #[FormField(span: 12)]
-    #[Filterable]
     #[ORM\Column(type: Types::STRING, length: 255, nullable: true, options: ['comment' => '英文名称'])]
     private ?string $enName = null;
 
@@ -85,8 +61,6 @@ class Department implements \Stringable, DepartmentInterface
      * order值大的排序靠前。有效的值范围是[0, 2^32].
      */
     #[IndexColumn]
-    #[FormField]
-    #[ListColumn(order: 95, sorter: true)]
     #[ORM\Column(type: Types::BIGINT, nullable: true, options: ['default' => '0', 'comment' => '次序值'])]
     private ?string $sortNumber = '0';
 

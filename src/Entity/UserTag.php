@@ -11,11 +11,6 @@ use Tourze\DoctrineIpBundle\Attribute\UpdateIpColumn;
 use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
 use Tourze\DoctrineUserBundle\Attribute\CreatedByColumn;
 use Tourze\DoctrineUserBundle\Attribute\UpdatedByColumn;
-use Tourze\EasyAdmin\Attribute\Action\Creatable;
-use Tourze\EasyAdmin\Attribute\Action\Deletable;
-use Tourze\EasyAdmin\Attribute\Action\Editable;
-use Tourze\EasyAdmin\Attribute\Column\ExportColumn;
-use Tourze\EasyAdmin\Attribute\Column\ListColumn;
 use Tourze\WechatWorkContracts\AgentInterface;
 use Tourze\WechatWorkContracts\CorpInterface;
 use WechatWorkStaffBundle\Repository\UserTagRepository;
@@ -23,17 +18,12 @@ use WechatWorkStaffBundle\Repository\UserTagRepository;
 /**
  * @see https://developer.work.weixin.qq.com/document/path/90210
  */
-#[Deletable]
-#[Editable]
-#[Creatable]
 #[ORM\Entity(repositoryClass: UserTagRepository::class)]
 #[ORM\Table(name: 'wechat_work_tag', options: ['comment' => '成员标签'])]
 #[ORM\UniqueConstraint(name: 'wechat_work_tag_idx_uniq', columns: ['corp_id', 'tag_id'])]
 class UserTag
 {
     use TimestampableAware;
-    #[ListColumn(order: -1)]
-    #[ExportColumn]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: Types::INTEGER, options: ['comment' => 'ID'])]
