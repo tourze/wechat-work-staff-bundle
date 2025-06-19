@@ -20,7 +20,7 @@ use WechatWorkStaffBundle\Repository\AgentUserRepository;
  */
 #[ORM\Entity(repositoryClass: AgentUserRepository::class)]
 #[ORM\Table(name: 'wechat_work_agent_user', options: ['comment' => '应用用户信息'])]
-class AgentUser
+class AgentUser implements \Stringable
 {
     use TimestampableAware;
     #[ORM\Id]
@@ -110,4 +110,9 @@ class AgentUser
     public function getUpdatedFromIp(): ?string
     {
         return $this->updatedFromIp;
-    }}
+    }
+    public function __toString(): string
+    {
+        return (string) $this->getId();
+    }
+}

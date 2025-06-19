@@ -18,6 +18,8 @@ use WechatWorkStaffBundle\Repository\UserRepository;
 #[AsCommand(name: 'wechat-work:check-user-avatar', description: '检查用户头像并保存')]
 class CheckUserAvatarCommand extends Command
 {
+    public const NAME = 'check-user-avatar';
+
     public function __construct(
         private readonly UserRepository $userRepository,
         private readonly SmartHttpClient $httpClient,

@@ -17,6 +17,8 @@ use WechatWorkStaffBundle\Request\Tag\GetTagListRequest;
 #[AsCommand(name: 'wechat-work:sync-user-tags', description: '同步获取成员标签')]
 class SyncUserTagsCommand extends Command
 {
+    public const NAME = 'sync-user-tags';
+
     public function __construct(
         private readonly AgentRepository $agentRepository,
         private readonly WorkService $workService,

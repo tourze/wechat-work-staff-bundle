@@ -13,14 +13,12 @@ use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
 use Tourze\DoctrineTrackBundle\Attribute\TrackColumn;
 use Tourze\DoctrineUserBundle\Attribute\CreatedByColumn;
 use Tourze\DoctrineUserBundle\Attribute\UpdatedByColumn;
-use Tourze\EasyAdmin\Attribute\Action\Listable;
 use Tourze\EasyAdmin\Attribute\Column\TreeView;
 use Tourze\WechatWorkContracts\AgentInterface;
 use Tourze\WechatWorkContracts\CorpInterface;
 use Tourze\WechatWorkContracts\DepartmentInterface;
 use WechatWorkStaffBundle\Repository\DepartmentRepository;
 
-#[Listable]
 #[TreeView(dataModel: Department::class, targetAttribute: 'parent')]
 #[ORM\Entity(repositoryClass: DepartmentRepository::class)]
 #[ORM\Table(name: 'wechat_work_department', options: ['comment' => '部门信息'])]

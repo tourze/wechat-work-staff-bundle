@@ -13,6 +13,8 @@ use WechatWorkStaffBundle\MessageHandler\SyncUserListHandler;
 #[AsCommand(name: 'wechat-work:sync-user-list', description: '同步指定企业的用户列表')]
 class SyncUserListCommand extends Command
 {
+    public const NAME = 'sync-user-list';
+
     public function __construct(private readonly SyncUserListHandler $handler)
     {
         parent::__construct();

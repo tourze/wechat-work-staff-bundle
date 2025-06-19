@@ -21,7 +21,7 @@ use WechatWorkStaffBundle\Repository\UserTagRepository;
 #[ORM\Entity(repositoryClass: UserTagRepository::class)]
 #[ORM\Table(name: 'wechat_work_tag', options: ['comment' => '成员标签'])]
 #[ORM\UniqueConstraint(name: 'wechat_work_tag_idx_uniq', columns: ['corp_id', 'tag_id'])]
-class UserTag
+class UserTag implements \Stringable
 {
     use TimestampableAware;
     #[ORM\Id]
@@ -207,4 +207,9 @@ class UserTag
     public function getUpdatedFromIp(): ?string
     {
         return $this->updatedFromIp;
-    }}
+    }
+    public function __toString(): string
+    {
+        return (string) $this->getId();
+    }
+}

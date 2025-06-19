@@ -12,14 +12,12 @@ use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
 use Tourze\DoctrineTrackBundle\Attribute\TrackColumn;
 use Tourze\DoctrineUserBundle\Attribute\CreatedByColumn;
 use Tourze\DoctrineUserBundle\Attribute\UpdatedByColumn;
-use Tourze\EasyAdmin\Attribute\Action\Listable;
 use Tourze\EasyAdmin\Attribute\Filter\Filterable;
 use Tourze\WechatWorkContracts\AgentInterface;
 use Tourze\WechatWorkContracts\CorpInterface;
 use Tourze\WechatWorkContracts\UserInterface;
 use WechatWorkStaffBundle\Repository\UserRepository;
 
-#[Listable]
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: 'wechat_work_user', options: ['comment' => '成员信息'])]
 #[ORM\UniqueConstraint(name: 'wechat_work_user_idx_uniq', columns: ['user_id', 'corp_id'])]
