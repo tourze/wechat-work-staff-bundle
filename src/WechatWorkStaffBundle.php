@@ -5,7 +5,7 @@ namespace WechatWorkStaffBundle;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
-use Tourze\DoctrineResolveTargetEntityBundle\DependencyInjection\ResolveTargetEntityPass;
+use Tourze\DoctrineResolveTargetEntityBundle\DependencyInjection\Compiler\ResolveTargetEntityPass;
 use Tourze\WechatWorkContracts\DepartmentInterface;
 use Tourze\WechatWorkContracts\UserInterface;
 use WechatWorkStaffBundle\Entity\Department;
