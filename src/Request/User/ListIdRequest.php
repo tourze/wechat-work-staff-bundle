@@ -24,7 +24,7 @@ class ListIdRequest extends ApiRequest
     /**
      * 分页，预期请求的数据量，取值范围 1 ~ 10000
      */
-    private ?int $limit = 1000;
+    private int $limit = 1000;
 
     public function getRequestPath(): string
     {

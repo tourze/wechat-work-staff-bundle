@@ -10,9 +10,7 @@ use Tourze\DoctrineIpBundle\Attribute\CreateIpColumn;
 use Tourze\DoctrineIpBundle\Attribute\UpdateIpColumn;
 use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
 use Tourze\DoctrineTrackBundle\Attribute\TrackColumn;
-use Tourze\DoctrineUserBundle\Attribute\CreatedByColumn;
-use Tourze\DoctrineUserBundle\Attribute\UpdatedByColumn;
-use Tourze\EasyAdmin\Attribute\Filter\Filterable;
+use Tourze\DoctrineUserBundle\Traits\BlameableAware;
 use Tourze\WechatWorkContracts\AgentInterface;
 use Tourze\WechatWorkContracts\CorpInterface;
 use Tourze\WechatWorkContracts\UserInterface;
@@ -24,6 +22,7 @@ use WechatWorkStaffBundle\Repository\UserRepository;
 class User implements \Stringable, UserInterface
 {
     use TimestampableAware;
+    use BlameableAware;
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: Types::INTEGER, options: ['comment' => 'ID'])]
@@ -36,12 +35,9 @@ class User implements \Stringable, UserInterface
     #[ORM\ManyToOne(targetEntity: AgentInterface::class)]
     private ?AgentInterface $agent = null;
 
-    /**
-     * 对应管理端的帐号，企业内必须唯一。
-     * 长度为1~64个字节。只能由数字、字母和“_-@.”四种字符组成，且第一个字符必须是数字或字母。系统进行唯一性检查时会忽略大小写。
-     */
+
     #[TrackColumn]
-    #[ORM\Column(type: Types::STRING, length: 128, options: ['comment' => '成员UserID'])]
+    #[ORM\Column(type: Types::STRING, length: 128, options: ['comment' => '成员UserID，对应管理端的帐号，企业内必须唯一。长度为1~64个字节。只能由数字、字母和_-@.四种字符组成，且第一个字符必须是数字或字母'])]
     private ?string $userId = null;
 
     #[TrackColumn]
@@ -56,32 +52,22 @@ class User implements \Stringable, UserInterface
     #[ORM\Column(type: Types::STRING, length: 64, nullable: true, options: ['comment' => '职务'])]
     private ?string $position = null;
 
-    /**
-     * 企业内必须唯一，mobile/email二者不能同时为空.
-     */
     #[TrackColumn]
-    #[ORM\Column(type: Types::STRING, length: 40, nullable: true, options: ['comment' => '手机号码'])]
+    #[ORM\Column(type: Types::STRING, length: 40, nullable: true, options: ['comment' => '手机号码，企业内必须唯一，mobile/email二者不能同时为空'])]
     private ?string $mobile = null;
 
-    /**
-     * 长度6~64个字节，且为有效的email格式。企业内必须唯一，mobile/email二者不能同时为空.
-     */
     #[TrackColumn]
-    #[ORM\Column(type: Types::STRING, length: 255, nullable: true, options: ['comment' => '邮箱'])]
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true, options: ['comment' => '邮箱，长度6~64个字节，且为有效的email格式。企业内必须唯一，mobile/email二者不能同时为空'])]
     private ?string $email = null;
 
     /**
      * @var Collection<Department>
      */
-    #[Filterable(label: '所属部门')]
     #[ORM\ManyToMany(targetEntity: Department::class, mappedBy: 'users', fetch: 'EXTRA_LAZY')]
     private Collection $departments;
 
-    /**
-     * 全局唯一。对于同一个服务商，不同应用获取到企业内同一个成员的open_userid是相同的，最多64个字节。仅第三方应用可获取.
-     */
     #[TrackColumn]
-    #[ORM\Column(type: Types::STRING, length: 120, nullable: true, options: ['comment' => '全局唯一UserID'])]
+    #[ORM\Column(type: Types::STRING, length: 120, nullable: true, options: ['comment' => '全局唯一UserID，对于同一个服务商，不同应用获取到企业内同一个成员的open_userid是相同的，最多64个字节'])]
     private ?string $openUserId = null;
 
     #[TrackColumn]
@@ -91,11 +77,9 @@ class User implements \Stringable, UserInterface
     #[ORM\ManyToMany(targetEntity: UserTag::class, inversedBy: 'users', fetch: 'EXTRA_LAZY')]
     private Collection $tags;
 
-    #[CreatedByColumn]
     #[ORM\Column(nullable: true, options: ['comment' => '创建人'])]
     private ?string $createdBy = null;
 
-    #[UpdatedByColumn]
     #[ORM\Column(nullable: true, options: ['comment' => '更新人'])]
     private ?string $updatedBy = null;
 
@@ -115,7 +99,7 @@ class User implements \Stringable, UserInterface
 
     public function __toString(): string
     {
-        if (!$this->getId()) {
+        if (null === $this->getId()) {
             return '';
         }
 
@@ -344,4 +328,5 @@ class User implements \Stringable, UserInterface
     public function getUpdatedFromIp(): ?string
     {
         return $this->updatedFromIp;
-    }}
+    }
+}

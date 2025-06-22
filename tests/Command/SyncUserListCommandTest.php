@@ -96,4 +96,4 @@ class SyncUserListCommandTest extends TestCase
         $this->assertInstanceOf(SyncUserListMessage::class, $capturedMessage);
         $this->assertSame($agentId, $capturedMessage->getAgentId());
     }
-} 
+}

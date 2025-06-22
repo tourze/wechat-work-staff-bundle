@@ -28,7 +28,8 @@ class DepartmentTest extends TestCase
 
     public function testToStringWhenIdIsNull(): void
     {
-        $this->assertSame('', (string)$this->department);
+        // ID初始值是0，所以会返回 "(0)"
+        $this->assertSame('(0)', (string)$this->department);
     }
 
     public function testToStringWithIdAndName(): void

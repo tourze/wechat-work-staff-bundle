@@ -95,4 +95,4 @@ class TestControllerTest extends TestCase
         $this->assertContains('agentRepository', $parameterNames);
         $this->assertContains('workService', $parameterNames);
     }
-} 
+}

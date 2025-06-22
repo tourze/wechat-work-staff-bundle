@@ -100,4 +100,4 @@ class SyncTagUsersCommandTest extends TestCase
         $this->assertSame(0, $result);
         $this->assertStringContainsString('', $commandTester->getDisplay());
     }
-} 
+}

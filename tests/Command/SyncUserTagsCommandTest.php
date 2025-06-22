@@ -97,4 +97,4 @@ class SyncUserTagsCommandTest extends TestCase
         
         // 验证通过了mock expectations
     }
-} 
+}

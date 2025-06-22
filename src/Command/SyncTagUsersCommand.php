@@ -17,10 +17,10 @@ use WechatWorkStaffBundle\Repository\UserTagRepository;
 use WechatWorkStaffBundle\Request\User\GetTagUsersRequest;
 
 #[AsCronTask('*/20 * * * *')]
-#[AsCommand(name: 'wechat-work:sync-tag-users', description: '同步获取标签成员')]
+#[AsCommand(name: self::NAME, description: '同步获取标签成员')]
 class SyncTagUsersCommand extends Command
 {
-    public const NAME = 'sync-tag-users';
+    public const NAME = 'wechat-work:sync-tag-users';
 
     public function __construct(
         private readonly AgentRepository $agentRepository,
@@ -38,7 +38,7 @@ class SyncTagUsersCommand extends Command
             foreach ($this->userTagRepository->findBy(['corp' => $agent->getCorp()]) as $tag) {
                 $request = new GetTagUsersRequest();
                 $request->setAgent($agent);
-                $request->setTagId($tag->getTagId());
+                $request->setTagId((string) $tag->getTagId());
                 $response = $this->workService->request($request);
 
                 if (isset($response['tagname']) && $response['tagname'] !== $tag->getName()) {
@@ -51,7 +51,7 @@ class SyncTagUsersCommand extends Command
                     $users = new ArrayCollection();
                     foreach ($response['userlist'] as $item) {
                         $user = $this->userLoader->loadUserByUserIdAndCorp($item['userid'], $agent->getCorp());
-                        if (!$user) {
+                        if (!$user instanceof User) {
                             $user = new User();
                             $user->setCorp($agent->getCorp());
                             $user->setUserId($item['userid']);

@@ -24,7 +24,7 @@ class GetDepartmentListRequest extends ApiRequest
     public function getRequestOptions(): ?array
     {
         $query = [];
-        if ($this->getId()) {
+        if (null !== $this->getId()) {
             $query['id'] = $this->getId();
         }
 

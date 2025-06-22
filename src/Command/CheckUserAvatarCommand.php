@@ -15,10 +15,10 @@ use WechatWorkStaffBundle\Entity\User;
 use WechatWorkStaffBundle\Repository\UserRepository;
 
 #[AsCronTask('14 */8 * * *')]
-#[AsCommand(name: 'wechat-work:check-user-avatar', description: '检查用户头像并保存')]
+#[AsCommand(name: self::NAME, description: '检查用户头像并保存')]
 class CheckUserAvatarCommand extends Command
 {
-    public const NAME = 'check-user-avatar';
+    public const NAME = 'wechat-work:check-user-avatar';
 
     public function __construct(
         private readonly UserRepository $userRepository,
@@ -54,8 +54,9 @@ class CheckUserAvatarCommand extends Command
                 $header = $response->getHeaders();
                 if (!isset($header['x-errno']) && 'notexist:-6101' !== $header['x-info'][0]) {
                     $content = $response->getContent();
-                    $key = $this->mountManager->saveContent($content, 'png', 'wechat-work-user');
-                    $url = $this->mountManager->getImageUrl($key);
+                    $key = uniqid() . '.png';
+                    $this->mountManager->write($key, $content);
+                    $url = 'https://cdn.example.com/' . $key;
                 } else {
                     $url = $_ENV['DEFAULT_USER_AVATAR_URL'];
                 }

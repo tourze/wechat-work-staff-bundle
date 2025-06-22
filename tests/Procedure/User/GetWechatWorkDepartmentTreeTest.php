@@ -128,4 +128,4 @@ class GetWechatWorkDepartmentTreeTest extends TestCase
         $procedure = new GetWechatWorkDepartmentTree($departmentRepository, $normalizer);
         $procedure->execute();
     }
-} 
+}

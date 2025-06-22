@@ -28,8 +28,7 @@ class SyncUserListHandler
         private readonly WorkService $workService,
         private readonly LoggerInterface $logger,
         private readonly EntityManagerInterface $entityManager,
-    ) {
-    }
+    ) {}
 
     public function __invoke(SyncUserListMessage $message): void
     {
@@ -47,8 +46,10 @@ class SyncUserListHandler
             $list = $this->workService->request($request);
 
             // 记录用于下次循环
-            if (isset($list['next_cursor']) && $list['next_cursor']) {
+            if (isset($list['next_cursor']) && !empty($list['next_cursor'])) {
                 $nextCursor = $list['next_cursor'];
+            } else {
+                $nextCursor = null;
             }
             if (!isset($list['dept_user'])) {
                 $this->logger->error('拉取用户列表时发生错误', [
@@ -60,41 +61,43 @@ class SyncUserListHandler
 
             foreach ($list['dept_user'] as $item) {
                 $user = $this->userLoader->loadUserByUserIdAndCorp($item['open_userid'], $agent->getCorp());
-                if (!$user) {
+                if (null === $user) {
                     $user = new User();
                     $user->setUserId($item['open_userid']);
                     $user->setCorp($agent->getCorp());
                 }
 
-                $user->setAgent($agent);
-                $user->setName($item['open_userid']); // TODO 当前拿不到用户名称那些信息喔？我们暂时塞 userid 进去
+                // 确保这是我们的User实体类型
+                if ($user instanceof User) {
+                    $user->setAgent($agent);
+                    $user->setName($item['open_userid']); // TODO 当前拿不到用户名称那些信息喔？我们暂时塞 userid 进去
 
-                // 处理部门信息
-                $currentDepartments = [];
-                if (isset($item['department'])) {
-                    if (!is_array($item['department'])) {
-                        $item['department'] = [
-                            $item['department'],
-                        ];
-                    }
+                    // 处理部门信息
+                    $currentDepartments = [];
+                    if (isset($item['department'])) {
+                        if (!is_array($item['department'])) {
+                            $item['department'] = [
+                                $item['department'],
+                            ];
+                        }
 
-                    foreach ($item['department'] as $departmentId) {
-                        $tmp = $this->departmentRepository->findOneBy([
-                            'remoteId' => $departmentId,
-                            'corp' => $user->getCorp(),
-                        ]);
-                        if ($tmp) {
-                            $currentDepartments[] = $tmp;
+                        foreach ($item['department'] as $departmentId) {
+                            $tmp = $this->departmentRepository->findOneBy([
+                                'remoteId' => $departmentId,
+                                'corp' => $user->getCorp(),
+                            ]);
+                            if (null !== $tmp) {
+                                $currentDepartments[] = $tmp;
+                            }
                         }
                     }
+                    $this->propertyAccessor->setValue($user, 'departments', $currentDepartments);
+
+                    $this->entityManager->persist($user);
+                    $this->entityManager->flush();
+
+                    $this->bizUserService->transformFromWorkUser($user);
                 }
-
-                $this->propertyAccessor->setValue($user, 'departments', $currentDepartments);
-
-                $this->entityManager->persist($user);
-                $this->entityManager->flush();
-
-                $this->bizUserService->transformFromWorkUser($user);
             }
         } while (null !== $nextCursor);
     }

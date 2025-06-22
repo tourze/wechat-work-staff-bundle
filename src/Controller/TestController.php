@@ -7,7 +7,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use WechatWorkBundle\Entity\AccessTokenAware;
+use Tourze\WechatWorkContracts\AgentInterface;
 use WechatWorkBundle\Repository\AgentRepository;
 use WechatWorkBundle\Repository\CorpRepository;
 use WechatWorkBundle\Service\WorkService;
@@ -23,8 +23,7 @@ class TestController extends AbstractController
         private readonly CorpRepository $corpRepository,
         private readonly AgentRepository $agentRepository,
         private readonly WorkService $workService,
-    ) {
-    }
+    ) {}
 
     #[Route('/department_list')]
     public function departmentList(Request $request): Response
@@ -80,10 +79,10 @@ class TestController extends AbstractController
         return $this->json($response);
     }
 
-    protected function getAgent(Request $request): AccessTokenAware
+    protected function getAgent(Request $request): AgentInterface
     {
         $corp = $this->corpRepository->find($request->query->get('corpId'));
-        if (!$corp) {
+        if (null === $corp) {
             $corp = $this->corpRepository->findOneBy([
                 'corpId' => $request->query->get('corpId'),
             ]);

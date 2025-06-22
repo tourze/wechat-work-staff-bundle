@@ -49,8 +49,7 @@ class GetWechatWorkUserByAuthCode extends LockableProcedure
         private readonly WorkService $workService,
         private readonly LoggerInterface $logger,
         private readonly EntityManagerInterface $entityManager,
-    ) {
-    }
+    ) {}
 
     public function execute(): array
     {
@@ -64,7 +63,7 @@ class GetWechatWorkUserByAuthCode extends LockableProcedure
             'corp' => $corp,
             'agentId' => $agentId,
         ]);
-        if (!$agent) {
+        if (null === $agent) {
             throw new NotFoundHttpException('找不到指定应用');
         }
 
@@ -106,31 +105,34 @@ class GetWechatWorkUserByAuthCode extends LockableProcedure
 
         // 保存企微用户信息
         $workUser = $this->userLoader->loadUserByUserIdAndCorp($result['userid'], $corp);
-        if (!$workUser) {
+        if (null === $workUser) {
             $workUser = new User();
             $workUser->setCorp($corp);
             $workUser->setUserId($result['userid']);
             $workUser->setAgent($agent);
         }
 
-        $workUser->setName($result['name']);
+        // 确保是我们的User实体类型
+        if ($workUser instanceof User) {
+            $workUser->setName($result['name']);
 
-        if (isset($result['avatar'])) {
-            $workUser->setAvatarUrl($result['avatar']);
-        }
-        if (isset($result['email'])) {
-            $workUser->setEmail($result['email']);
-        }
-        if (isset($result['mobile'])) {
-            $workUser->setMobile($result['mobile']);
-        }
+            if (isset($result['avatar'])) {
+                $workUser->setAvatarUrl($result['avatar']);
+            }
+            if (isset($result['email'])) {
+                $workUser->setEmail($result['email']);
+            }
+            if (isset($result['mobile'])) {
+                $workUser->setMobile($result['mobile']);
+            }
 
-        $this->entityManager->persist($workUser);
-        $this->entityManager->flush();
+            $this->entityManager->persist($workUser);
+            $this->entityManager->flush();
 
-        // 转换为系统用户，并生成JWT
-        $bizUser = $this->bizUserService->transformFromWorkUser($workUser);
-        $result['jwt'] = $this->accessTokenService->createToken($bizUser);
+            // 转换为系统用户，并生成JWT
+            $bizUser = $this->bizUserService->transformFromWorkUser($workUser);
+            $result['jwt'] = $this->accessTokenService->createToken($bizUser);
+        }
 
         return $result;
     }

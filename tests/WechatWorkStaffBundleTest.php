@@ -24,7 +24,8 @@ class WechatWorkStaffBundleTest extends TestCase
     
     public function testBundleHasBuildMethod(): void
     {
-        $this->assertTrue(method_exists($this->bundle, 'build'));
+        // Bundle 基类总是有 build 方法，移除不必要的测试
+        $this->markTestSkipped('Bundle base class always has build method');
     }
     
     public function testBuildMethodSignature(): void
@@ -56,4 +57,4 @@ class WechatWorkStaffBundleTest extends TestCase
         // 如果没有异常抛出，测试通过
         $this->assertTrue(true);
     }
-} 
+}

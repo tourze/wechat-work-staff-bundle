@@ -54,4 +54,4 @@ class CheckUserAvatarCommandTest extends TestCase
         $this->assertNotNull($this->command);
         $this->assertInstanceOf(CheckUserAvatarCommand::class, $this->command);
     }
-} 
+}

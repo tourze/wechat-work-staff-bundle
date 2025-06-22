@@ -140,4 +140,4 @@ class GetWechatWorkUserByAuthCodeTest extends TestCase
         $this->assertTrue(method_exists($procedure, 'execute'));
         $this->assertTrue(method_exists($procedure, 'getResult'));
     }
-} 
+}

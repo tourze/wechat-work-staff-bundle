@@ -3,6 +3,7 @@
 namespace WechatWorkStaffBundle\Tests\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use PHPUnit\Framework\TestCase;
 use Tourze\WechatWorkContracts\AgentInterface;
 use Tourze\WechatWorkContracts\CorpInterface;
@@ -29,7 +30,8 @@ class UserTest extends TestCase
 
     public function testToStringWhenIdIsNull(): void
     {
-        $this->assertSame('', (string)$this->user);
+        // ID初始值是0，没有name和userId，所以会返回 "()"
+        $this->assertSame('()', (string)$this->user);
     }
 
     public function testToStringWithIdUserIdAndName(): void
@@ -404,5 +406,148 @@ class UserTest extends TestCase
         $this->assertSame('complete@example.com', $this->user->getEmail());
         $this->assertSame('open_complete_123', $this->user->getOpenUserId());
         $this->assertSame('https://example.com/complete.jpg', $this->user->getAvatarUrl());
+    }
+
+    public function test_user_entity_implements_stringable(): void
+    {
+        $this->assertInstanceOf(\Stringable::class, $this->user);
+
+        $this->user->setUserId('test_user');
+        $this->user->setName('测试用户');
+
+        $stringRepresentation = (string) $this->user;
+        $this->assertIsString($stringRepresentation);
+        $this->assertNotEmpty($stringRepresentation);
+    }
+
+    public function test_user_id_operations(): void
+    {
+        $userId = 'user_123456';
+
+        $this->user->setUserId($userId);
+        $this->assertEquals($userId, $this->user->getUserId());
+    }
+
+    public function test_user_name_operations(): void
+    {
+        $name = '张三';
+
+        $this->user->setName($name);
+        $this->assertEquals($name, $this->user->getName());
+    }
+
+    public function test_user_alias_operations(): void
+    {
+        $alias = 'zhangsan';
+
+        $this->user->setAlias($alias);
+        $this->assertEquals($alias, $this->user->getAlias());
+
+        // 测试空值
+        $this->user->setAlias(null);
+        $this->assertNull($this->user->getAlias());
+    }
+
+    public function test_user_contact_info_operations(): void
+    {
+        $mobile = '13800138000';
+        $email = 'zhangsan@example.com';
+
+        $this->user->setMobile($mobile);
+        $this->user->setEmail($email);
+
+        $this->assertEquals($mobile, $this->user->getMobile());
+        $this->assertEquals($email, $this->user->getEmail());
+    }
+
+    public function test_user_avatar_operations(): void
+    {
+        $avatarUrl = 'https://example.com/avatar/zhangsan.jpg';
+
+        $this->user->setAvatarUrl($avatarUrl);
+        $this->assertEquals($avatarUrl, $this->user->getAvatarUrl());
+    }
+
+    public function test_user_position_operations(): void
+    {
+        $position = '软件工程师';
+
+        $this->user->setPosition($position);
+        $this->assertEquals($position, $this->user->getPosition());
+    }
+
+    public function test_user_open_user_id_operations(): void
+    {
+        $openUserId = 'open_user_123456';
+
+        $this->user->setOpenUserId($openUserId);
+        $this->assertEquals($openUserId, $this->user->getOpenUserId());
+
+        // 测试空值
+        $this->user->setOpenUserId(null);
+        $this->assertNull($this->user->getOpenUserId());
+    }
+
+    public function test_user_departments_collection(): void
+    {
+        $departments = $this->user->getDepartments();
+
+        $this->assertInstanceOf(Collection::class, $departments);
+        $this->assertTrue($departments->isEmpty());
+
+        // 测试添加部门
+        $department = new Department();
+        $department->setName('技术部');
+
+        $this->user->addDepartment($department);
+        $this->assertCount(1, $this->user->getDepartments());
+        $this->assertTrue($this->user->getDepartments()->contains($department));
+
+        // 测试移除部门
+        $this->user->removeDepartment($department);
+        $this->assertCount(0, $this->user->getDepartments());
+        $this->assertFalse($this->user->getDepartments()->contains($department));
+    }
+
+    public function test_user_tags_collection(): void
+    {
+        $tags = $this->user->getTags();
+
+        $this->assertInstanceOf(Collection::class, $tags);
+        $this->assertTrue($tags->isEmpty());
+
+        // 测试添加标签
+        $tag = new UserTag();
+        $tag->setName('VIP客户');
+
+        $this->user->addTag($tag);
+        $this->assertCount(1, $this->user->getTags());
+        $this->assertTrue($this->user->getTags()->contains($tag));
+
+        // 测试移除标签
+        $this->user->removeTag($tag);
+        $this->assertCount(0, $this->user->getTags());
+        $this->assertFalse($this->user->getTags()->contains($tag));
+    }
+
+    public function test_user_entity_properties_with_null_values(): void
+    {
+        // 测试可为空的属性
+        $this->assertNull($this->user->getAlias());
+        $this->assertNull($this->user->getPosition());
+        $this->assertNull($this->user->getMobile());
+        $this->assertNull($this->user->getEmail());
+        $this->assertNull($this->user->getAvatarUrl());
+    }
+
+    public function test_user_entity_required_properties(): void
+    {
+        // 测试必填属性的默认值
+        $this->assertNull($this->user->getUserId());
+        $this->assertNull($this->user->getName());
+
+        // 测试有默认值的属性
+        $this->assertNotNull($this->user->getDepartments());
+        $this->assertNotNull($this->user->getTags());
     }
 }

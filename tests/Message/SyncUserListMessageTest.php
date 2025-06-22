@@ -52,4 +52,4 @@ class SyncUserListMessageTest extends TestCase
         $result = $this->message->setAgentId($agentId);
         $this->assertNull($result); // setter方法没有返回值
     }
-} 
+}

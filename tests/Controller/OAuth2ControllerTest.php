@@ -100,4 +100,4 @@ class OAuth2ControllerTest extends TestCase
         $this->assertEquals('agentId', $authRedirectParams[1]->getName());
         $this->assertEquals('string', $authRedirectParams[1]->getType()?->getName());
     }
-} 
+}

@@ -14,10 +14,10 @@ use WechatWorkStaffBundle\Entity\UserTag;
 use WechatWorkStaffBundle\Request\Tag\GetTagListRequest;
 
 #[AsCronTask('30 */8 * * *')]
-#[AsCommand(name: 'wechat-work:sync-user-tags', description: '同步获取成员标签')]
+#[AsCommand(name: self::NAME, description: '同步获取成员标签')]
 class SyncUserTagsCommand extends Command
 {
-    public const NAME = 'sync-user-tags';
+    public const NAME = 'wechat-work:sync-user-tags';
 
     public function __construct(
         private readonly AgentRepository $agentRepository,

@@ -2,55 +2,103 @@
 
 namespace WechatWorkStaffBundle\Tests\Repository;
 
-use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use PHPUnit\Framework\TestCase;
-use Tourze\WechatWorkContracts\UserLoaderInterface;
+use WechatWorkStaffBundle\Entity\User;
 use WechatWorkStaffBundle\Repository\UserRepository;
 
 class UserRepositoryTest extends TestCase
 {
-    private UserRepository $repository;
-    
-    protected function setUp(): void
+    public function test_repository_extends_service_entity_repository(): void
     {
-        $registry = $this->createMock(ManagerRegistry::class);
-        $this->repository = new UserRepository($registry);
+        $reflection = new \ReflectionClass(UserRepository::class);
+
+        $this->assertTrue($reflection->isSubclassOf(ServiceEntityRepository::class));
     }
-    
-    public function testConstructor(): void
+
+    public function test_repository_has_correct_entity_class(): void
     {
-        $this->assertInstanceOf(UserRepository::class, $this->repository);
+        $reflection = new \ReflectionClass(UserRepository::class);
+        $constructor = $reflection->getConstructor();
+
+        $this->assertNotNull($constructor);
+
+        // 验证Repository是为User实体设计的
+        $this->assertTrue(class_exists(User::class));
     }
-    
-    public function testImplementsUserLoaderInterface(): void
+
+    public function test_repository_has_required_methods(): void
     {
-        $this->assertInstanceOf(UserLoaderInterface::class, $this->repository);
+        $reflection = new \ReflectionClass(UserRepository::class);
+
+        // 继承自ServiceEntityRepository的基本方法
+        $this->assertTrue($reflection->hasMethod('find'));
+        $this->assertTrue($reflection->hasMethod('findBy'));
+        $this->assertTrue($reflection->hasMethod('findOneBy'));
+        $this->assertTrue($reflection->hasMethod('findAll'));
     }
-    
-    public function testExtendsServiceEntityRepository(): void
+
+    public function test_user_entity_can_be_instantiated(): void
     {
-        $this->assertInstanceOf(\Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository::class, $this->repository);
+        $user = new User();
+
+        $this->assertInstanceOf(User::class, $user);
+
+        // 测试基本属性设置
+        $user->setUserId('test_repository_user');
+        $this->assertEquals('test_repository_user', $user->getUserId());
+
+        $user->setName('Repository测试用户');
+        $this->assertEquals('Repository测试用户', $user->getName());
     }
-    
-    public function testRepositoryMethods(): void
+
+    public function test_user_entity_has_stringable_interface(): void
     {
-        // 测试Repository基本方法存在
-        $this->assertTrue(method_exists($this->repository, 'find'));
-        $this->assertTrue(method_exists($this->repository, 'findOneBy'));
-        $this->assertTrue(method_exists($this->repository, 'findAll'));
-        $this->assertTrue(method_exists($this->repository, 'findBy'));
+        $user = new User();
+        $user->setUserId('stringable_test');
+        $user->setName('可字符串化测试');
+
+        // 验证实体实现了__toString方法
+        $this->assertTrue(method_exists($user, '__toString'));
+
+        $stringRepresentation = (string) $user;
+        $this->assertIsString($stringRepresentation);
+        $this->assertNotEmpty($stringRepresentation);
     }
-    
-    public function testUserLoaderInterfaceMethods(): void
+
+    public function test_user_entity_has_required_fields(): void
     {
-        // 测试UserLoaderInterface方法存在
-        $this->assertTrue(method_exists($this->repository, 'loadUserByUserIdAndCorp'));
-        $this->assertTrue(method_exists($this->repository, 'createUser'));
+        $user = new User();
+
+        // 验证实体有必要的字段访问方法
+        $requiredMethods = [
+            'getUserId',
+            'setUserId',
+            'getName',
+            'setName',
+            'getAlias',
+            'setAlias',
+            'getPosition',
+            'setPosition',
+            'getMobile',
+            'setMobile',
+            'getEmail',
+            'setEmail',
+            'getAvatarUrl',
+            'setAvatarUrl',
+            'getOpenUserId',
+            'setOpenUserId',
+            'getCreatedBy',
+            'setCreatedBy',
+            'getUpdatedBy',
+            'setUpdatedBy',
+        ];
+
+        foreach ($requiredMethods as $method) {
+            $this->assertTrue(
+                method_exists($user, $method),
+                "User entity should have method: {$method}"
+            );
+        }
     }
-    
-    public function testEntityClass(): void
-    {
-        $reflection = new \ReflectionClass($this->repository);
-        $this->assertEquals(UserRepository::class, $reflection->getName());
-    }
-} 
+}

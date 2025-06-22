@@ -59,7 +59,7 @@ class DepartmentCreateRequest extends ApiRequest
             $json['order'] = $this->getOrder();
         }
 
-        if (null !== $this->getParentId()) {
+        if (null !== $this->getId()) {
             $json['id'] = $this->getId();
         }
 

@@ -15,13 +15,11 @@ use WechatWorkStaffBundle\Request\Tag\UpdateTagRequest;
 #[AsEntityListener(event: Events::preUpdate, method: 'preUpdate', entity: UserTag::class)]
 class UserTagListener
 {
-    public function __construct(private readonly WorkService $workService)
-    {
-    }
+    public function __construct(private readonly WorkService $workService) {}
 
     public function prePersist(UserTag $object): void
     {
-        if ($object->getTagId() && $object->getName()) {
+        if (null !== $object->getTagId() && null !== $object->getName()) {
             return;
         }
 
