@@ -41,6 +41,7 @@
     "tourze/json-rpc-lock-bundle": "0.1.*",
     "tourze/json-rpc-log-bundle": "0.1.*",
     "tourze/symfony-cron-job-bundle": "0.1.*",
+    "tourze/symfony-routing-auto-loader-bundle": "0.0.*",
     "tourze/user-service-contracts": "0.0.*",
     "tourze/wechat-work-bundle": "0.1.*",
     "tourze/wechat-work-contracts": "0.0.*",

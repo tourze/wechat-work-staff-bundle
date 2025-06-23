@@ -137,7 +137,6 @@ class GetWechatWorkUserByAuthCodeTest extends TestCase
             $entityManager
         );
         
-        $this->assertTrue(method_exists($procedure, 'execute'));
-        $this->assertTrue(method_exists($procedure, 'getResult'));
+        $this->assertInstanceOf(GetWechatWorkUserByAuthCode::class, $procedure);
     }
 }

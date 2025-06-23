@@ -59,10 +59,7 @@ class UserRepositoryTest extends TestCase
         $user->setName('可字符串化测试');
 
         // 验证实体实现了__toString方法
-        $this->assertTrue(method_exists($user, '__toString'));
-
         $stringRepresentation = (string) $user;
-        $this->assertIsString($stringRepresentation);
         $this->assertNotEmpty($stringRepresentation);
     }
 

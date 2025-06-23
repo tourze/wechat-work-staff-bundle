@@ -45,11 +45,11 @@ class SyncUserListMessageTest extends TestCase
         $this->assertSame($agentId, $this->message->getAgentId());
     }
     
-    public function testSetAgentIdReturnType(): void
+    public function testSetAgentIdReturnsVoid(): void
     {
         $agentId = 456;
         
-        $result = $this->message->setAgentId($agentId);
-        $this->assertNull($result); // setter方法没有返回值
+        $this->message->setAgentId($agentId);
+        $this->assertSame($agentId, $this->message->getAgentId());
     }
 }

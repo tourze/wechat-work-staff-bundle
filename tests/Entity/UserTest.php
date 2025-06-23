@@ -416,7 +416,6 @@ class UserTest extends TestCase
         $this->user->setName('测试用户');
 
         $stringRepresentation = (string) $this->user;
-        $this->assertIsString($stringRepresentation);
         $this->assertNotEmpty($stringRepresentation);
     }
 

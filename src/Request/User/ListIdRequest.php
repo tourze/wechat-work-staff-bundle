@@ -38,9 +38,7 @@ class ListIdRequest extends ApiRequest
         if (null !== $this->getCursor()) {
             $json['cursor'] = $this->getCursor();
         }
-        if (null !== $this->getLimit()) {
-            $json['limit'] = $this->getLimit();
-        }
+        $json['limit'] = $this->getLimit();
 
         return [
             'json' => $json,
