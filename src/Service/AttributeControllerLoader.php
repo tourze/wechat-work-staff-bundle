@@ -16,7 +16,7 @@ use WechatWorkStaffBundle\Controller\TestSimpleUserListController;
 use WechatWorkStaffBundle\Controller\TestUserDetailController;
 use WechatWorkStaffBundle\Controller\TestUserIdListController;
 
-#[AutoconfigureTag('routing.loader')]
+#[AutoconfigureTag(name: 'routing.loader')]
 class AttributeControllerLoader extends Loader implements RoutingAutoLoaderInterface
 {
     private AttributeRouteControllerLoader $controllerLoader;

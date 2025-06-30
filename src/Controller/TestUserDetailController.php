@@ -21,7 +21,7 @@ class TestUserDetailController extends AbstractController
         private readonly WorkService $workService,
     ) {}
 
-    #[Route('/wechat/work/test/get_user_detail', name: 'wechat_work_test_user_detail')]
+    #[Route(path: '/wechat/work/test/get_user_detail', name: 'wechat_work_test_user_detail')]
     public function __invoke(Request $request): Response
     {
         $agent = $this->getAgent($request);

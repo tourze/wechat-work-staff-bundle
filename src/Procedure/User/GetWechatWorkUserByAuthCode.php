@@ -24,20 +24,20 @@ use WechatWorkStaffBundle\Request\Auth\GetUserInfoByCodeRequest;
 use WechatWorkStaffBundle\Request\User\GetUserRequest;
 use WechatWorkStaffBundle\Service\BizUserService;
 
-#[MethodTag('企业微信')]
+#[MethodTag(name: '企业微信')]
 #[Log]
-#[MethodExpose('GetWechatWorkUserByAuthCode')]
-#[MethodDoc('根据企业微信返回的Code来获取用户信息')]
-#[WithMonologChannel('procedure')]
+#[MethodExpose(method: 'GetWechatWorkUserByAuthCode')]
+#[MethodDoc(summary: '根据企业微信返回的Code来获取用户信息')]
+#[WithMonologChannel(channel: 'procedure')]
 class GetWechatWorkUserByAuthCode extends LockableProcedure
 {
-    #[MethodParam('企业ID')]
+    #[MethodParam(description: '企业ID')]
     public string $corpId;
 
-    #[MethodParam('应用ID')]
+    #[MethodParam(description: '应用ID')]
     public string $agentId;
 
-    #[MethodParam('授权Code')]
+    #[MethodParam(description: '授权Code')]
     public string $code;
 
     public function __construct(

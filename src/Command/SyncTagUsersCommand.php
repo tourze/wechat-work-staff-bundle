@@ -16,7 +16,7 @@ use WechatWorkStaffBundle\Entity\User;
 use WechatWorkStaffBundle\Repository\UserTagRepository;
 use WechatWorkStaffBundle\Request\User\GetTagUsersRequest;
 
-#[AsCronTask('*/20 * * * *')]
+#[AsCronTask(expression: '*/20 * * * *')]
 #[AsCommand(name: self::NAME, description: '同步获取标签成员')]
 class SyncTagUsersCommand extends Command
 {

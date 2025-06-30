@@ -13,7 +13,7 @@ use WechatWorkBundle\Service\WorkService;
 use WechatWorkStaffBundle\Entity\UserTag;
 use WechatWorkStaffBundle\Request\Tag\GetTagListRequest;
 
-#[AsCronTask('30 */8 * * *')]
+#[AsCronTask(expression: '30 */8 * * *')]
 #[AsCommand(name: self::NAME, description: '同步获取成员标签')]
 class SyncUserTagsCommand extends Command
 {

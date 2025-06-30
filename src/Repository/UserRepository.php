@@ -17,7 +17,7 @@ use WechatWorkStaffBundle\Entity\User;
  * @method User[]    findAll()
  * @method User[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-#[AsAlias(UserLoaderInterface::class)]
+#[AsAlias(id: UserLoaderInterface::class)]
 class UserRepository extends ServiceEntityRepository implements UserLoaderInterface
 {
     public function __construct(ManagerRegistry $registry)

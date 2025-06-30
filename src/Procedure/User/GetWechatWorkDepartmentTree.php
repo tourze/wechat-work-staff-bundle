@@ -12,10 +12,10 @@ use Tourze\JsonRPC\Core\Attribute\MethodTag;
 use Tourze\JsonRPC\Core\Procedure\BaseProcedure;
 use WechatWorkStaffBundle\Repository\DepartmentRepository;
 
-#[MethodTag('企业微信')]
-#[MethodDoc('获取企业微信组织结构树')]
-#[MethodExpose('GetWechatWorkDepartmentTree')]
-#[IsGranted('IS_AUTHENTICATED_FULLY')]
+#[MethodTag(name: '企业微信')]
+#[MethodDoc(summary: '获取企业微信组织结构树')]
+#[MethodExpose(method: 'GetWechatWorkDepartmentTree')]
+#[IsGranted(attribute: 'IS_AUTHENTICATED_FULLY')]
 class GetWechatWorkDepartmentTree extends BaseProcedure
 {
     public function __construct(

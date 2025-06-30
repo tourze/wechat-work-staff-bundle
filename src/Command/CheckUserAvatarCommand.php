@@ -14,7 +14,7 @@ use Tourze\Symfony\CronJob\Attribute\AsCronTask;
 use WechatWorkStaffBundle\Entity\User;
 use WechatWorkStaffBundle\Repository\UserRepository;
 
-#[AsCronTask('14 */8 * * *')]
+#[AsCronTask(expression: '14 */8 * * *')]
 #[AsCommand(name: self::NAME, description: '检查用户头像并保存')]
 class CheckUserAvatarCommand extends Command
 {

@@ -21,7 +21,7 @@ class TestUserIdListController extends AbstractController
         private readonly WorkService $workService,
     ) {}
 
-    #[Route('/wechat/work/test/get_user_id_list', name: 'wechat_work_test_user_id_list')]
+    #[Route(path: '/wechat/work/test/get_user_id_list', name: 'wechat_work_test_user_id_list')]
     public function __invoke(Request $request): Response
     {
         $agent = $this->getAgent($request);

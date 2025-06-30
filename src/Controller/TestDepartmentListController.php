@@ -21,7 +21,7 @@ class TestDepartmentListController extends AbstractController
         private readonly WorkService $workService,
     ) {}
 
-    #[Route('/wechat/work/test/department_list', name: 'wechat_work_test_department_list')]
+    #[Route(path: '/wechat/work/test/department_list', name: 'wechat_work_test_department_list')]
     public function __invoke(Request $request): Response
     {
         $agent = $this->getAgent($request);

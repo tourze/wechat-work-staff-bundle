@@ -21,7 +21,7 @@ class TestSimpleUserListController extends AbstractController
         private readonly WorkService $workService,
     ) {}
 
-    #[Route('/wechat/work/test/simple_user_list', name: 'wechat_work_test_simple_user_list')]
+    #[Route(path: '/wechat/work/test/simple_user_list', name: 'wechat_work_test_simple_user_list')]
     public function __invoke(Request $request): Response
     {
         $agent = $this->getAgent($request);
@@ -30,7 +30,7 @@ class TestSimpleUserListController extends AbstractController
 
         $apiRequest = new GetUserSimpleListRequest();
         $apiRequest->setAgent($agent);
-        $apiRequest->setDepartmentId($departmentId);
+        $apiRequest->setDepartmentId((int) $departmentId);
         $response = $this->workService->request($apiRequest);
 
         return $this->json($response);
