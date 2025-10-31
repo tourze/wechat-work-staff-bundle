@@ -10,7 +10,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Tourze\AccessTokenBundle\Service\AccessTokenService;
+use Tourze\AccessTokenContracts\TokenServiceInterface;
 use Tourze\JsonRPC\Core\Attribute\MethodDoc;
 use Tourze\JsonRPC\Core\Attribute\MethodExpose;
 use Tourze\JsonRPC\Core\Attribute\MethodParam;
@@ -51,7 +51,7 @@ class GetWechatWorkUserByAuthCode extends BaseProcedure
         private readonly ?AgentRepository $agentRepository = null,
         private readonly ?UserLoaderInterface $userLoader = null,
         private readonly ?BizUserService $bizUserService = null,
-        private readonly ?AccessTokenService $accessTokenService = null,
+        private readonly ?TokenServiceInterface $accessTokenService = null,
         private readonly ?WorkServiceInterface $workService = null,
         private readonly ?LoggerInterface $logger = null,
         private readonly ?EntityManagerInterface $entityManager = null,
