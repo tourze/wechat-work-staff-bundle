@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatWorkStaffBundle\Request\User;
 
 use HttpClientBundle\Request\ApiRequest;
@@ -8,7 +10,7 @@ use WechatWorkBundle\Request\AgentAware;
 /**
  * 获取成员ID列表
  *
- * 这个接口，我们使用来替代 GetUserSimpleListRequest
+ * 替代已废弃的 GetUserSimpleListRequest API (自2022年8月15日起废弃)
  *
  * @see https://developer.work.weixin.qq.com/document/path/96021
  */
@@ -46,7 +48,7 @@ class ListIdRequest extends ApiRequest
     }
 
     /**
-     * Get the value of cursor
+     * 获取游标值
      */
     public function getCursor(): ?string
     {
@@ -54,17 +56,15 @@ class ListIdRequest extends ApiRequest
     }
 
     /**
-     * Set the value of cursor
+     * 设置游标值
      */
-    public function setCursor(?string $cursor): self
+    public function setCursor(?string $cursor): void
     {
         $this->cursor = $cursor;
-
-        return $this;
     }
 
     /**
-     * Get the value of limit
+     * 获取限制数量
      */
     public function getLimit(): int
     {
@@ -72,12 +72,10 @@ class ListIdRequest extends ApiRequest
     }
 
     /**
-     * Set the value of limit
+     * 设置限制数量
      */
-    public function setLimit(int $limit): self
+    public function setLimit(int $limit): void
     {
         $this->limit = $limit;
-
-        return $this;
     }
 }

@@ -6,6 +6,9 @@ services:
 
   WechatWorkStaffBundle\Command\:
     resource: '../../Command/'
+  WechatWorkStaffBundle\Controller\:
+    resource: '../../Controller/'
+    tags: ['controller.service_arguments']
   WechatWorkStaffBundle\EventSubscriber\:
     resource: '../../EventSubscriber/'
   WechatWorkStaffBundle\MessageHandler\:
@@ -20,3 +23,83 @@ services:
   wechat-work-staff-bundle.property-accessor:
     class: Symfony\Component\PropertyAccess\PropertyAccessor
     factory: [ 'Symfony\Component\PropertyAccess\PropertyAccess', 'createPropertyAccessor' ]
+
+  # 为包含可选依赖的服务提供明确配置
+  WechatWorkStaffBundle\Command\CheckUserAvatarCommand:
+    arguments:
+      $mountManager: '@?League\Flysystem\FilesystemOperator'
+
+  WechatWorkStaffBundle\Command\SyncTagUsersCommand:
+    arguments:
+      $agentRepository: '@?WechatWorkBundle\Repository\AgentRepository'
+      $workService: '@?WechatWorkBundle\Service\WorkService'
+
+  WechatWorkStaffBundle\Command\SyncUserTagsCommand:
+    arguments:
+      $agentRepository: '@?WechatWorkBundle\Repository\AgentRepository'
+      $workService: '@?WechatWorkBundle\Service\WorkServiceInterface'
+      $userTagRepository: '@?WechatWorkStaffBundle\Repository\UserTagRepository'
+
+  WechatWorkStaffBundle\EventSubscriber\UserTagListener:
+    arguments:
+      $workService: '@?WechatWorkBundle\Service\WorkService'
+
+  WechatWorkStaffBundle\MessageHandler\SyncUserListHandler:
+    arguments:
+      $agentRepository: '@?WechatWorkBundle\Repository\AgentRepository'
+      $workService: '@?WechatWorkBundle\Service\WorkService'
+
+  WechatWorkStaffBundle\Procedure\User\GetWechatWorkUserByAuthCode:
+    arguments:
+      $agentRepository: '@?WechatWorkBundle\Repository\AgentRepository'
+      $corpRepository: '@?WechatWorkBundle\Repository\CorpRepository'
+      $workService: '@?WechatWorkBundle\Service\WorkService'
+
+  WechatWorkStaffBundle\Service\BizUserService:
+    arguments:
+      $userManager: '@?Tourze\UserServiceContracts\UserManagerInterface'
+
+  # 为控制器提供可选依赖配置
+  WechatWorkStaffBundle\Controller\AuthCallbackController:
+    arguments:
+      $noticeService: '@?WeuiBundle\Service\NoticeService'
+
+  WechatWorkStaffBundle\Controller\ConnectCallbackController:
+    arguments:
+      $noticeService: '@?WeuiBundle\Service\NoticeService'
+
+  WechatWorkStaffBundle\Controller\AuthRedirectController:
+    arguments:
+      $corpRepository: '@?WechatWorkBundle\Repository\CorpRepository'
+      $agentRepository: '@?WechatWorkBundle\Repository\AgentRepository'
+
+  WechatWorkStaffBundle\Controller\ConnectRedirectController:
+    arguments:
+      $corpRepository: '@?WechatWorkBundle\Repository\CorpRepository'
+      $agentRepository: '@?WechatWorkBundle\Repository\AgentRepository'
+
+  WechatWorkStaffBundle\Controller\TestDepartmentListController:
+    arguments:
+      $corpRepository: '@?WechatWorkBundle\Repository\CorpRepository'
+      $agentRepository: '@?WechatWorkBundle\Repository\AgentRepository'
+      $workService: '@?WechatWorkBundle\Service\WorkService'
+
+  WechatWorkStaffBundle\Controller\TestSimpleUserListController:
+    arguments:
+      $corpRepository: '@?WechatWorkBundle\Repository\CorpRepository'
+      $agentRepository: '@?WechatWorkBundle\Repository\AgentRepository'
+      $workService: '@?WechatWorkBundle\Service\WorkService'
+
+  WechatWorkStaffBundle\Controller\TestUserDetailController:
+    arguments:
+      $corpRepository: '@?WechatWorkBundle\Repository\CorpRepository'
+      $agentRepository: '@?WechatWorkBundle\Repository\AgentRepository'
+      $workService: '@?WechatWorkBundle\Service\WorkService'
+
+  WechatWorkStaffBundle\Controller\TestUserIdListController:
+    arguments:
+      $corpRepository: '@?WechatWorkBundle\Repository\CorpRepository'
+      $agentRepository: '@?WechatWorkBundle\Repository\AgentRepository'
+      $workService: '@?WechatWorkBundle\Service\WorkService'
+
+

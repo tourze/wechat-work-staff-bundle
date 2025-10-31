@@ -1,12 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatWorkStaffBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Tourze\DoctrineIpBundle\Attribute\CreateIpColumn;
-use Tourze\DoctrineIpBundle\Attribute\UpdateIpColumn;
-use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
+use Symfony\Component\Validator\Constraints as Assert;
+use Tourze\DoctrineIpBundle\Traits\IpTraceableAware;
 use Tourze\DoctrineSnowflakeBundle\Traits\SnowflakeKeyAware;
 use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
 use Tourze\WechatWorkContracts\AgentInterface;
@@ -25,36 +26,30 @@ class AgentUser implements \Stringable
 {
     use TimestampableAware;
     use SnowflakeKeyAware;
+    use IpTraceableAware;
 
     #[ORM\ManyToOne(targetEntity: AgentInterface::class)]
     #[ORM\JoinColumn(nullable: true)]
     private ?AgentInterface $agent = null;
 
     #[ORM\Column(type: Types::STRING, length: 120, options: ['comment' => '企业用户ID'])]
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 120)]
     private ?string $userId = null;
 
     #[ORM\Column(type: Types::STRING, length: 120, options: ['comment' => 'OpenID'])]
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 120)]
     private ?string $openId = null;
-
-    #[CreateIpColumn]
-    #[ORM\Column(length: 128, nullable: true, options: ['comment' => '创建时IP'])]
-    private ?string $createdFromIp = null;
-
-    #[UpdateIpColumn]
-    #[ORM\Column(length: 128, nullable: true, options: ['comment' => '更新时IP'])]
-    private ?string $updatedFromIp = null;
-
 
     public function getAgent(): ?AgentInterface
     {
         return $this->agent;
     }
 
-    public function setAgent(?AgentInterface $agent): self
+    public function setAgent(?AgentInterface $agent): void
     {
         $this->agent = $agent;
-
-        return $this;
     }
 
     public function getUserId(): ?string
@@ -62,11 +57,9 @@ class AgentUser implements \Stringable
         return $this->userId;
     }
 
-    public function setUserId(string $userId): self
+    public function setUserId(string $userId): void
     {
         $this->userId = $userId;
-
-        return $this;
     }
 
     public function getOpenId(): ?string
@@ -74,36 +67,11 @@ class AgentUser implements \Stringable
         return $this->openId;
     }
 
-    public function setOpenId(string $openId): self
+    public function setOpenId(string $openId): void
     {
         $this->openId = $openId;
-
-        return $this;
     }
 
-    public function setCreatedFromIp(?string $createdFromIp): self
-    {
-        $this->createdFromIp = $createdFromIp;
-
-        return $this;
-    }
-
-    public function getCreatedFromIp(): ?string
-    {
-        return $this->createdFromIp;
-    }
-
-    public function setUpdatedFromIp(?string $updatedFromIp): self
-    {
-        $this->updatedFromIp = $updatedFromIp;
-
-        return $this;
-    }
-
-    public function getUpdatedFromIp(): ?string
-    {
-        return $this->updatedFromIp;
-    }
     public function __toString(): string
     {
         return (string) $this->getId();

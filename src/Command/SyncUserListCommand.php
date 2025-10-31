@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatWorkStaffBundle\Command;
 
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -28,8 +30,12 @@ class SyncUserListCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $agentId = $input->getArgument('agentId');
+        assert(is_int($agentId) || (is_string($agentId) && ctype_digit($agentId)));
+        $agentIdInt = is_int($agentId) ? $agentId : (int) $agentId;
+
         $message = new SyncUserListMessage();
-        $message->setAgentId($input->getArgument('agentId'));
+        $message->setAgentId($agentIdInt);
         $this->handler->__invoke($message);
 
         return Command::SUCCESS;

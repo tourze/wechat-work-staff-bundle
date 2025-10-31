@@ -1,21 +1,56 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatWorkStaffBundle\Tests\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use Tourze\DoctrineResolveTargetEntityBundle\Testing\TestEntityGenerator;
+use Tourze\PHPUnitDoctrineEntity\AbstractEntityTestCase;
 use Tourze\WechatWorkContracts\AgentInterface;
 use Tourze\WechatWorkContracts\CorpInterface;
 use WechatWorkStaffBundle\Entity\User;
 use WechatWorkStaffBundle\Entity\UserTag;
 
-class UserTagTest extends TestCase
+/**
+ * @internal
+ */
+#[CoversClass(UserTag::class)]
+final class UserTagTest extends AbstractEntityTestCase
 {
+    protected function createEntity(): object
+    {
+        return new UserTag();
+    }
+
+    /**
+     * @return array<string, array{string, mixed}>
+     */
+    public static function propertiesProvider(): array
+    {
+        return [
+            'name' => ['name', '高级工程师'],
+            'agent' => ['agent', null],
+            'corp' => ['corp', null],
+            'tagId' => ['tagId', 12345],
+            'createdBy' => ['createdBy', 'admin'],
+            'updatedBy' => ['updatedBy', 'moderator'],
+            'createdFromIp' => ['createdFromIp', '192.168.1.50'],
+            'updatedFromIp' => ['updatedFromIp', '10.0.0.25'],
+            'createTime' => ['createTime', new \DateTimeImmutable('2024-01-01 11:00:00')],
+            'updateTime' => ['updateTime', new \DateTimeImmutable('2024-01-02 17:30:00')],
+        ];
+    }
+
     private UserTag $userTag;
+
+    private TestEntityGenerator $testEntityGenerator;
 
     protected function setUp(): void
     {
         $this->userTag = new UserTag();
+        $this->testEntityGenerator = new TestEntityGenerator(sys_get_temp_dir() . '/test_entities');
     }
 
     public function testConstructor(): void
@@ -33,40 +68,41 @@ class UserTagTest extends TestCase
     {
         $name = '高级工程师';
 
-        $result = $this->userTag->setName($name);
-        $this->assertSame($this->userTag, $result);
+        $this->userTag->setName($name);
         $this->assertSame($name, $this->userTag->getName());
     }
 
     public function testSetAndGetAgent(): void
     {
-        $agent = $this->createMock(AgentInterface::class);
+        /** @var AgentInterface $agent */
+        $agent = $this->testEntityGenerator
+            ->generateTestImplementation(AgentInterface::class)
+        ;
 
-        $result = $this->userTag->setAgent($agent);
-        $this->assertSame($this->userTag, $result);
+        $this->userTag->setAgent($agent);
         $this->assertSame($agent, $this->userTag->getAgent());
     }
 
     public function testSetAndGetAgentWithNull(): void
     {
-        $result = $this->userTag->setAgent(null);
-        $this->assertSame($this->userTag, $result);
+        $this->userTag->setAgent(null);
         $this->assertNull($this->userTag->getAgent());
     }
 
     public function testSetAndGetCorp(): void
     {
-        $corp = $this->createMock(CorpInterface::class);
+        /** @var CorpInterface $corp */
+        $corp = $this->testEntityGenerator
+            ->generateTestImplementation(CorpInterface::class)
+        ;
 
-        $result = $this->userTag->setCorp($corp);
-        $this->assertSame($this->userTag, $result);
+        $this->userTag->setCorp($corp);
         $this->assertSame($corp, $this->userTag->getCorp());
     }
 
     public function testSetAndGetCorpWithNull(): void
     {
-        $result = $this->userTag->setCorp(null);
-        $this->assertSame($this->userTag, $result);
+        $this->userTag->setCorp(null);
         $this->assertNull($this->userTag->getCorp());
     }
 
@@ -74,15 +110,13 @@ class UserTagTest extends TestCase
     {
         $tagId = 12345;
 
-        $result = $this->userTag->setTagId($tagId);
-        $this->assertSame($this->userTag, $result);
+        $this->userTag->setTagId($tagId);
         $this->assertSame($tagId, $this->userTag->getTagId());
     }
 
     public function testSetAndGetTagIdWithNull(): void
     {
-        $result = $this->userTag->setTagId(null);
-        $this->assertSame($this->userTag, $result);
+        $this->userTag->setTagId(null);
         $this->assertNull($this->userTag->getTagId());
     }
 
@@ -90,8 +124,7 @@ class UserTagTest extends TestCase
     {
         $user = new User();
 
-        $result = $this->userTag->addUser($user);
-        $this->assertSame($this->userTag, $result);
+        $this->userTag->addUser($user);
         $this->assertCount(1, $this->userTag->getUsers());
         $this->assertTrue($this->userTag->getUsers()->contains($user));
     }
@@ -111,8 +144,7 @@ class UserTagTest extends TestCase
         $user = new User();
         $this->userTag->addUser($user);
 
-        $result = $this->userTag->removeUser($user);
-        $this->assertSame($this->userTag, $result);
+        $this->userTag->removeUser($user);
         $this->assertCount(0, $this->userTag->getUsers());
     }
 
@@ -135,8 +167,7 @@ class UserTagTest extends TestCase
         // 创建新的用户集合
         $newUsers = new ArrayCollection([$user2, $user3]);
 
-        $result = $this->userTag->replaceUsers($newUsers);
-        $this->assertSame($this->userTag, $result);
+        $this->userTag->replaceUsers($newUsers);
         $this->assertCount(2, $this->userTag->getUsers());
 
         $this->assertFalse($this->userTag->getUsers()->contains($user1));
@@ -155,8 +186,7 @@ class UserTagTest extends TestCase
 
         $emptyCollection = new ArrayCollection([]);
 
-        $result = $this->userTag->replaceUsers($emptyCollection);
-        $this->assertSame($this->userTag, $result);
+        $this->userTag->replaceUsers($emptyCollection);
         $this->assertCount(0, $this->userTag->getUsers());
     }
 
@@ -164,15 +194,13 @@ class UserTagTest extends TestCase
     {
         $createdBy = 'admin';
 
-        $result = $this->userTag->setCreatedBy($createdBy);
-        $this->assertSame($this->userTag, $result);
+        $this->userTag->setCreatedBy($createdBy);
         $this->assertSame($createdBy, $this->userTag->getCreatedBy());
     }
 
     public function testSetAndGetCreatedByWithNull(): void
     {
-        $result = $this->userTag->setCreatedBy(null);
-        $this->assertSame($this->userTag, $result);
+        $this->userTag->setCreatedBy(null);
         $this->assertNull($this->userTag->getCreatedBy());
     }
 
@@ -180,15 +208,13 @@ class UserTagTest extends TestCase
     {
         $updatedBy = 'moderator';
 
-        $result = $this->userTag->setUpdatedBy($updatedBy);
-        $this->assertSame($this->userTag, $result);
+        $this->userTag->setUpdatedBy($updatedBy);
         $this->assertSame($updatedBy, $this->userTag->getUpdatedBy());
     }
 
     public function testSetAndGetUpdatedByWithNull(): void
     {
-        $result = $this->userTag->setUpdatedBy(null);
-        $this->assertSame($this->userTag, $result);
+        $this->userTag->setUpdatedBy(null);
         $this->assertNull($this->userTag->getUpdatedBy());
     }
 
@@ -196,15 +222,13 @@ class UserTagTest extends TestCase
     {
         $ip = '192.168.1.50';
 
-        $result = $this->userTag->setCreatedFromIp($ip);
-        $this->assertSame($this->userTag, $result);
+        $this->userTag->setCreatedFromIp($ip);
         $this->assertSame($ip, $this->userTag->getCreatedFromIp());
     }
 
     public function testSetAndGetCreatedFromIpWithNull(): void
     {
-        $result = $this->userTag->setCreatedFromIp(null);
-        $this->assertSame($this->userTag, $result);
+        $this->userTag->setCreatedFromIp(null);
         $this->assertNull($this->userTag->getCreatedFromIp());
     }
 
@@ -212,15 +236,13 @@ class UserTagTest extends TestCase
     {
         $ip = '10.0.0.25';
 
-        $result = $this->userTag->setUpdatedFromIp($ip);
-        $this->assertSame($this->userTag, $result);
+        $this->userTag->setUpdatedFromIp($ip);
         $this->assertSame($ip, $this->userTag->getUpdatedFromIp());
     }
 
     public function testSetAndGetUpdatedFromIpWithNull(): void
     {
-        $result = $this->userTag->setUpdatedFromIp(null);
-        $this->assertSame($this->userTag, $result);
+        $this->userTag->setUpdatedFromIp(null);
         $this->assertNull($this->userTag->getUpdatedFromIp());
     }
 
@@ -284,16 +306,21 @@ class UserTagTest extends TestCase
 
     public function testTagWithCompleteConfiguration(): void
     {
-        $corp = $this->createMock(CorpInterface::class);
-        $agent = $this->createMock(AgentInterface::class);
+        /** @var CorpInterface $corp */
+        $corp = $this->testEntityGenerator
+            ->generateTestImplementation(CorpInterface::class)
+        ;
+        /** @var AgentInterface $agent */
+        $agent = $this->testEntityGenerator
+            ->generateTestImplementation(AgentInterface::class)
+        ;
 
-        $this->userTag
-            ->setName('资深专家')
-            ->setAgent($agent)
-            ->setCorp($corp)
-            ->setTagId(12345)
-            ->setCreatedBy('system')
-            ->setUpdatedBy('admin');
+        $this->userTag->setName('资深专家');
+        $this->userTag->setAgent($agent);
+        $this->userTag->setCorp($corp);
+        $this->userTag->setTagId(12345);
+        $this->userTag->setCreatedBy('system');
+        $this->userTag->setUpdatedBy('admin');
 
         $this->assertSame('资深专家', $this->userTag->getName());
         $this->assertSame($agent, $this->userTag->getAgent());

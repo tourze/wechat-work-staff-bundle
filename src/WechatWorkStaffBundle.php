@@ -1,19 +1,26 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatWorkStaffBundle;
 
+use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Tourze\BundleDependency\BundleDependencyInterface;
 use Tourze\DoctrineResolveTargetEntityBundle\DependencyInjection\Compiler\ResolveTargetEntityPass;
+use Tourze\JsonRPCSecurityBundle\JsonRPCSecurityBundle;
+use Tourze\RoutingAutoLoaderBundle\RoutingAutoLoaderBundle;
 use Tourze\WechatWorkContracts\DepartmentInterface;
 use Tourze\WechatWorkContracts\UserInterface;
+use WechatWorkBundle\WechatWorkBundle;
 use WechatWorkStaffBundle\Entity\Department;
 use WechatWorkStaffBundle\Entity\User;
 
-class WechatWorkStaffBundle extends Bundle
+class WechatWorkStaffBundle extends Bundle implements BundleDependencyInterface
 {
-    public function build(ContainerBuilder $container): void
+    public function build(ContainerBuilder $container)
     {
         parent::build($container);
 
@@ -28,5 +35,15 @@ class WechatWorkStaffBundle extends Bundle
             PassConfig::TYPE_BEFORE_OPTIMIZATION,
             1000,
         );
+    }
+
+    public static function getBundleDependencies(): array
+    {
+        return [
+            DoctrineBundle::class => ['all' => true],
+            RoutingAutoLoaderBundle::class => ['all' => true],
+            WechatWorkBundle::class => ['all' => true],
+            JsonRPCSecurityBundle::class => ['all' => true],
+        ];
     }
 }

@@ -1,48 +1,77 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatWorkStaffBundle\Controller;
 
-use Doctrine\Common\Collections\Criteria;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Tourze\WechatWorkContracts\AgentInterface;
+use WechatWorkBundle\Entity\Corp;
 use WechatWorkBundle\Repository\AgentRepository;
 use WechatWorkBundle\Repository\CorpRepository;
-use WechatWorkBundle\Service\WorkService;
+use WechatWorkBundle\Service\WorkServiceInterface;
 use WechatWorkStaffBundle\Request\User\GetUserRequest;
 
-class TestUserDetailController extends AbstractController
+#[Autoconfigure(public: true)]
+final class TestUserDetailController extends AbstractController
 {
     public function __construct(
-        private readonly CorpRepository $corpRepository,
-        private readonly AgentRepository $agentRepository,
-        private readonly WorkService $workService,
-    ) {}
+        private readonly ?CorpRepository $corpRepository = null,
+        private readonly ?AgentRepository $agentRepository = null,
+        private readonly ?WorkServiceInterface $workService = null,
+    ) {
+    }
 
-    #[Route(path: '/wechat/work/test/get_user_detail', name: 'wechat_work_test_user_detail')]
+    #[Route(path: '/wechat/work/test/user_detail', name: 'wechat_work_test_user_detail', methods: ['GET', 'POST'])]
     public function __invoke(Request $request): Response
     {
+        if (null === $this->workService) {
+            return $this->json(['error' => '服务不可用'], 503);
+        }
+
         $agent = $this->getAgent($request);
+        if (null === $agent) {
+            return $this->json(['error' => 'Agent not found'], 404);
+        }
 
         $userId = $request->query->get('userId');
 
         $apiRequest = new GetUserRequest();
         $apiRequest->setAgent($agent);
-        $apiRequest->setUserId($userId);
+        $apiRequest->setUserId((string) ($userId ?? ''));
         $response = $this->workService->request($apiRequest);
 
         return $this->json($response);
     }
 
-    protected function getAgent(Request $request): AgentInterface
+    protected function getAgent(Request $request): ?AgentInterface
     {
-        $corp = $this->corpRepository->find($request->query->get('corpId'));
+        if (null === $this->corpRepository || null === $this->agentRepository) {
+            return null;
+        }
+
+        $corpId = $request->query->get('corpId');
+        if (null === $corpId) {
+            return null;
+        }
+
+        $corp = null;
+        if (is_numeric($corpId)) {
+            $corp = $this->corpRepository->find((int) $corpId);
+        }
+
         if (null === $corp) {
             $corp = $this->corpRepository->findOneBy([
-                'corpId' => $request->query->get('corpId'),
+                'corpId' => $corpId,
             ]);
+        }
+
+        if (null === $corp) {
+            return null;
         }
 
         if ($request->query->has('agentId')) {
@@ -55,6 +84,6 @@ class TestUserDetailController extends AbstractController
         // 默认拿第一个
         return $this->agentRepository->findOneBy([
             'corp' => $corp,
-        ], ['id' => Criteria::ASC]);
+        ], ['id' => 'ASC']);
     }
 }

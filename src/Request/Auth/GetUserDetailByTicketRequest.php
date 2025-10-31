@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatWorkStaffBundle\Request\Auth;
 
 use HttpClientBundle\Request\ApiRequest;
@@ -24,6 +26,9 @@ class GetUserDetailByTicketRequest extends ApiRequest
         return '/cgi-bin/auth/getuserdetail';
     }
 
+    /**
+     * @return array<string, mixed>|null
+     */
     public function getRequestOptions(): ?array
     {
         return [

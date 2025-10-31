@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatWorkStaffBundle\Request\Auth;
 
 use HttpClientBundle\Request\ApiRequest;
@@ -25,6 +27,9 @@ class AuthSuccessConfirmRequest extends ApiRequest
         return '/cgi-bin/user/authsucc';
     }
 
+    /**
+     * @return array<string, mixed>|null
+     */
     public function getRequestOptions(): ?array
     {
         return [

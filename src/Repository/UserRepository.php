@@ -1,10 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatWorkStaffBundle\Repository;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\DependencyInjection\Attribute\AsAlias;
+use Tourze\PHPUnitSymfonyKernelTest\Attribute\AsRepository;
 use Tourze\WechatWorkContracts\AgentInterface;
 use Tourze\WechatWorkContracts\CorpInterface;
 use Tourze\WechatWorkContracts\UserInterface;
@@ -12,12 +15,10 @@ use Tourze\WechatWorkContracts\UserLoaderInterface;
 use WechatWorkStaffBundle\Entity\User;
 
 /**
- * @method User|null find($id, $lockMode = null, $lockVersion = null)
- * @method User|null findOneBy(array $criteria, array $orderBy = null)
- * @method User[]    findAll()
- * @method User[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @extends ServiceEntityRepository<User>
  */
 #[AsAlias(id: UserLoaderInterface::class)]
+#[AsRepository(entityClass: User::class)]
 class UserRepository extends ServiceEntityRepository implements UserLoaderInterface
 {
     public function __construct(ManagerRegistry $registry)
@@ -27,7 +28,9 @@ class UserRepository extends ServiceEntityRepository implements UserLoaderInterf
 
     public function loadUserByUserIdAndCorp(string $userId, CorpInterface $corp): ?UserInterface
     {
-        return $this->findOneBy(['userId' => $userId, 'corp' => $corp]);
+        $user = $this->findOneBy(['userId' => $userId, 'corp' => $corp]);
+
+        return $user instanceof UserInterface ? $user : null;
     }
 
     public function createUser(CorpInterface $corp, AgentInterface $agent, string $userId, string $name): UserInterface
@@ -37,8 +40,28 @@ class UserRepository extends ServiceEntityRepository implements UserLoaderInterf
         $user->setAgent($agent);
         $user->setUserId($userId);
         $user->setName($name);
+
         $this->getEntityManager()->persist($user);
         $this->getEntityManager()->flush();
+
         return $user;
+    }
+
+    public function save(User $entity, bool $flush = true): void
+    {
+        $this->getEntityManager()->persist($entity);
+
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+    }
+
+    public function remove(User $entity, bool $flush = true): void
+    {
+        $this->getEntityManager()->remove($entity);
+
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
     }
 }

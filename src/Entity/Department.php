@@ -1,14 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatWorkStaffBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 use Tourze\DoctrineIndexedBundle\Attribute\IndexColumn;
-use Tourze\DoctrineIpBundle\Attribute\CreateIpColumn;
-use Tourze\DoctrineIpBundle\Attribute\UpdateIpColumn;
+use Tourze\DoctrineIpBundle\Traits\IpTraceableAware;
 use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
 use Tourze\DoctrineTrackBundle\Attribute\TrackColumn;
 use Tourze\DoctrineUserBundle\Traits\BlameableAware;
@@ -24,14 +26,16 @@ class Department implements \Stringable, DepartmentInterface
 {
     use TimestampableAware;
     use BlameableAware;
+    use IpTraceableAware;
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: Types::INTEGER, options: ['comment' => 'ID'])]
-    private ?int $id = 0;
+    private int $id = 0;
 
     #[TrackColumn]
     #[ORM\Column(type: Types::INTEGER, nullable: true, options: ['comment' => '远程ID'])]
+    #[Assert\Type(type: 'integer')]
     private ?int $remoteId = null;
 
     #[ORM\ManyToOne(targetEntity: CorpInterface::class)]
@@ -44,10 +48,13 @@ class Department implements \Stringable, DepartmentInterface
     #[IndexColumn]
     #[TrackColumn]
     #[ORM\Column(type: Types::STRING, length: 120, options: ['comment' => '部门名称'])]
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 120)]
     private ?string $name = null;
 
     #[TrackColumn]
     #[ORM\Column(type: Types::STRING, length: 255, nullable: true, options: ['comment' => '英文名称'])]
+    #[Assert\Length(max: 255)]
     private ?string $enName = null;
 
     #[ORM\ManyToOne(targetEntity: Department::class, inversedBy: 'children')]
@@ -56,27 +63,21 @@ class Department implements \Stringable, DepartmentInterface
 
     #[IndexColumn]
     #[ORM\Column(type: Types::BIGINT, nullable: true, options: ['default' => '0', 'comment' => '次序值, order值大的排序靠前。有效的值范围是[0, 2^32]'])]
+    #[Assert\Range(min: 0, max: 4294967296)]
+    #[Assert\Length(max: 20)]
     private ?string $sortNumber = '0';
 
     /**
-     * @var Collection<Department>
+     * @var Collection<int, Department>
      */
     #[ORM\OneToMany(targetEntity: Department::class, mappedBy: 'parent')]
     private Collection $children;
 
     /**
-     * @var Collection<User>
+     * @var Collection<int, User>
      */
     #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'departments', fetch: 'EXTRA_LAZY')]
     private Collection $users;
-
-    #[CreateIpColumn]
-    #[ORM\Column(length: 128, nullable: true, options: ['comment' => '创建时IP'])]
-    private ?string $createdFromIp = null;
-
-    #[UpdateIpColumn]
-    #[ORM\Column(length: 128, nullable: true, options: ['comment' => '更新时IP'])]
-    private ?string $updatedFromIp = null;
 
     public function __construct()
     {
@@ -86,14 +87,14 @@ class Department implements \Stringable, DepartmentInterface
 
     public function __toString(): string
     {
-        if (null === $this->getId()) {
+        if (0 === $this->getId()) {
             return '';
         }
 
         return "{$this->getName()}({$this->getId()})";
     }
 
-    public function getId(): ?int
+    public function getId(): int
     {
         return $this->id;
     }
@@ -103,23 +104,19 @@ class Department implements \Stringable, DepartmentInterface
         return $this->remoteId;
     }
 
-    public function setRemoteId(?int $remoteId): self
+    public function setRemoteId(?int $remoteId): void
     {
         $this->remoteId = $remoteId;
-
-        return $this;
     }
 
     public function getName(): string
     {
-        return (string)$this->name;
+        return (string) $this->name;
     }
 
-    public function setName(string $name): self
+    public function setName(string $name): void
     {
         $this->name = $name;
-
-        return $this;
     }
 
     public function getEnName(): ?string
@@ -127,11 +124,9 @@ class Department implements \Stringable, DepartmentInterface
         return $this->enName;
     }
 
-    public function setEnName(?string $enName): self
+    public function setEnName(?string $enName): void
     {
         $this->enName = $enName;
-
-        return $this;
     }
 
     public function getSortNumber(): ?string
@@ -139,11 +134,9 @@ class Department implements \Stringable, DepartmentInterface
         return $this->sortNumber;
     }
 
-    public function setSortNumber(?string $sortNumber): self
+    public function setSortNumber(?string $sortNumber): void
     {
         $this->sortNumber = $sortNumber;
-
-        return $this;
     }
 
     public function getParent(): ?Department
@@ -151,11 +144,9 @@ class Department implements \Stringable, DepartmentInterface
         return $this->parent;
     }
 
-    public function setParent(?Department $parent): self
+    public function setParent(?Department $parent): void
     {
         $this->parent = $parent;
-
-        return $this;
     }
 
     /**
@@ -166,17 +157,15 @@ class Department implements \Stringable, DepartmentInterface
         return $this->children;
     }
 
-    public function addChild(Department $child): self
+    public function addChild(Department $child): void
     {
         if (!$this->children->contains($child)) {
-            $this->children[] = $child;
+            $this->children->add($child);
             $child->setParent($this);
         }
-
-        return $this;
     }
 
-    public function removeChild(Department $child): self
+    public function removeChild(Department $child): void
     {
         if ($this->children->removeElement($child)) {
             // set the owning side to null (unless already changed)
@@ -184,8 +173,6 @@ class Department implements \Stringable, DepartmentInterface
                 $child->setParent(null);
             }
         }
-
-        return $this;
     }
 
     /**
@@ -196,20 +183,16 @@ class Department implements \Stringable, DepartmentInterface
         return $this->users;
     }
 
-    public function addUser(User $user): self
+    public function addUser(User $user): void
     {
         if (!$this->users->contains($user)) {
-            $this->users[] = $user;
+            $this->users->add($user);
         }
-
-        return $this;
     }
 
-    public function removeUser(User $user): self
+    public function removeUser(User $user): void
     {
         $this->users->removeElement($user);
-
-        return $this;
     }
 
     public function getCorp(): ?CorpInterface
@@ -217,11 +200,9 @@ class Department implements \Stringable, DepartmentInterface
         return $this->corp;
     }
 
-    public function setCorp(?CorpInterface $corp): self
+    public function setCorp(?CorpInterface $corp): void
     {
         $this->corp = $corp;
-
-        return $this;
     }
 
     public function getAgent(): ?AgentInterface
@@ -229,34 +210,8 @@ class Department implements \Stringable, DepartmentInterface
         return $this->agent;
     }
 
-    public function setAgent(?AgentInterface $agent): self
+    public function setAgent(?AgentInterface $agent): void
     {
         $this->agent = $agent;
-
-        return $this;
-    }
-
-    public function setCreatedFromIp(?string $createdFromIp): self
-    {
-        $this->createdFromIp = $createdFromIp;
-
-        return $this;
-    }
-
-    public function getCreatedFromIp(): ?string
-    {
-        return $this->createdFromIp;
-    }
-
-    public function setUpdatedFromIp(?string $updatedFromIp): self
-    {
-        $this->updatedFromIp = $updatedFromIp;
-
-        return $this;
-    }
-
-    public function getUpdatedFromIp(): ?string
-    {
-        return $this->updatedFromIp;
     }
 }

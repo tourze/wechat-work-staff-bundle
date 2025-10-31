@@ -1,13 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatWorkStaffBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Tourze\DoctrineIpBundle\Attribute\CreateIpColumn;
-use Tourze\DoctrineIpBundle\Attribute\UpdateIpColumn;
+use Symfony\Component\Validator\Constraints as Assert;
+use Tourze\DoctrineIpBundle\Traits\IpTraceableAware;
 use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
 use Tourze\DoctrineTrackBundle\Attribute\TrackColumn;
 use Tourze\DoctrineUserBundle\Traits\BlameableAware;
@@ -23,10 +25,12 @@ class User implements \Stringable, UserInterface
 {
     use TimestampableAware;
     use BlameableAware;
+    use IpTraceableAware;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: Types::INTEGER, options: ['comment' => 'ID'])]
-    private ?int $id = 0;
+    private int $id = 0;
 
     #[ORM\ManyToOne(targetEntity: CorpInterface::class)]
     #[ORM\JoinColumn(nullable: false)]
@@ -35,61 +39,63 @@ class User implements \Stringable, UserInterface
     #[ORM\ManyToOne(targetEntity: AgentInterface::class)]
     private ?AgentInterface $agent = null;
 
-
     #[TrackColumn]
     #[ORM\Column(type: Types::STRING, length: 128, options: ['comment' => '成员UserID，对应管理端的帐号，企业内必须唯一。长度为1~64个字节。只能由数字、字母和_-@.四种字符组成，且第一个字符必须是数字或字母'])]
+    #[Assert\NotBlank]
+    #[Assert\Length(min: 1, max: 64)]
+    #[Assert\Regex(pattern: '/^[a-zA-Z0-9][a-zA-Z0-9_\-@.]*$/')]
     private ?string $userId = null;
 
     #[TrackColumn]
     #[ORM\Column(type: Types::STRING, length: 128, options: ['comment' => '成员名称'])]
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 128)]
     private ?string $name = null;
 
     #[TrackColumn]
     #[ORM\Column(type: Types::STRING, length: 255, nullable: true, options: ['comment' => '成员别名'])]
+    #[Assert\Length(max: 255)]
     private ?string $alias = null;
 
     #[TrackColumn]
     #[ORM\Column(type: Types::STRING, length: 64, nullable: true, options: ['comment' => '职务'])]
+    #[Assert\Length(max: 64)]
     private ?string $position = null;
 
     #[TrackColumn]
     #[ORM\Column(type: Types::STRING, length: 40, nullable: true, options: ['comment' => '手机号码，企业内必须唯一，mobile/email二者不能同时为空'])]
+    #[Assert\Length(max: 40)]
+    #[Assert\Regex(pattern: '/^1[3-9]\d{9}$/', message: '手机号码格式不正确')]
     private ?string $mobile = null;
 
     #[TrackColumn]
     #[ORM\Column(type: Types::STRING, length: 255, nullable: true, options: ['comment' => '邮箱，长度6~64个字节，且为有效的email格式。企业内必须唯一，mobile/email二者不能同时为空'])]
+    #[Assert\Email]
+    #[Assert\Length(min: 6, max: 255)]
     private ?string $email = null;
 
     /**
-     * @var Collection<Department>
+     * @var Collection<int, Department>
      */
     #[ORM\ManyToMany(targetEntity: Department::class, mappedBy: 'users', fetch: 'EXTRA_LAZY')]
     private Collection $departments;
 
     #[TrackColumn]
     #[ORM\Column(type: Types::STRING, length: 120, nullable: true, options: ['comment' => '全局唯一UserID，对于同一个服务商，不同应用获取到企业内同一个成员的open_userid是相同的，最多64个字节'])]
+    #[Assert\Length(max: 120)]
     private ?string $openUserId = null;
 
     #[TrackColumn]
     #[ORM\Column(length: 180, nullable: true, options: ['comment' => '头像地址'])]
+    #[Assert\Url]
+    #[Assert\Length(max: 180)]
     private ?string $avatarUrl = null;
 
+    /**
+     * @var Collection<int, UserTag>
+     */
     #[ORM\ManyToMany(targetEntity: UserTag::class, inversedBy: 'users', fetch: 'EXTRA_LAZY')]
     private Collection $tags;
-
-    #[ORM\Column(nullable: true, options: ['comment' => '创建人'])]
-    private ?string $createdBy = null;
-
-    #[ORM\Column(nullable: true, options: ['comment' => '更新人'])]
-    private ?string $updatedBy = null;
-
-    #[CreateIpColumn]
-    #[ORM\Column(length: 128, nullable: true, options: ['comment' => '创建时IP'])]
-    private ?string $createdFromIp = null;
-
-    #[UpdateIpColumn]
-    #[ORM\Column(length: 128, nullable: true, options: ['comment' => '更新时IP'])]
-    private ?string $updatedFromIp = null;
 
     public function __construct()
     {
@@ -99,14 +105,14 @@ class User implements \Stringable, UserInterface
 
     public function __toString(): string
     {
-        if (null === $this->getId()) {
+        if (0 === $this->getId()) {
             return '';
         }
 
         return "{$this->getName()}({$this->getUserId()})";
     }
 
-    public function getId(): ?int
+    public function getId(): int
     {
         return $this->id;
     }
@@ -116,11 +122,9 @@ class User implements \Stringable, UserInterface
         return $this->corp;
     }
 
-    public function setCorp(?CorpInterface $corp): self
+    public function setCorp(?CorpInterface $corp): void
     {
         $this->corp = $corp;
-
-        return $this;
     }
 
     public function getAgent(): ?AgentInterface
@@ -128,11 +132,9 @@ class User implements \Stringable, UserInterface
         return $this->agent;
     }
 
-    public function setAgent(?AgentInterface $agent): self
+    public function setAgent(?AgentInterface $agent): void
     {
         $this->agent = $agent;
-
-        return $this;
     }
 
     public function getUserId(): ?string
@@ -140,23 +142,19 @@ class User implements \Stringable, UserInterface
         return $this->userId;
     }
 
-    public function setUserId(string $userId): self
+    public function setUserId(string $userId): void
     {
         $this->userId = $userId;
-
-        return $this;
     }
 
-    public function getName(): ?string
+    public function getName(): string
     {
-        return $this->name;
+        return $this->name ?? '';
     }
 
-    public function setName(string $name): self
+    public function setName(string $name): void
     {
         $this->name = $name;
-
-        return $this;
     }
 
     public function getAlias(): ?string
@@ -164,11 +162,9 @@ class User implements \Stringable, UserInterface
         return $this->alias;
     }
 
-    public function setAlias(?string $alias): self
+    public function setAlias(?string $alias): void
     {
         $this->alias = $alias;
-
-        return $this;
     }
 
     public function getMobile(): ?string
@@ -176,11 +172,9 @@ class User implements \Stringable, UserInterface
         return $this->mobile;
     }
 
-    public function setMobile(?string $mobile): self
+    public function setMobile(?string $mobile): void
     {
         $this->mobile = $mobile;
-
-        return $this;
     }
 
     public function getEmail(): ?string
@@ -188,11 +182,9 @@ class User implements \Stringable, UserInterface
         return $this->email;
     }
 
-    public function setEmail(?string $email): self
+    public function setEmail(?string $email): void
     {
         $this->email = $email;
-
-        return $this;
     }
 
     /**
@@ -203,23 +195,19 @@ class User implements \Stringable, UserInterface
         return $this->departments;
     }
 
-    public function addDepartment(Department $department): self
+    public function addDepartment(Department $department): void
     {
         if (!$this->departments->contains($department)) {
-            $this->departments[] = $department;
+            $this->departments->add($department);
             $department->addUser($this);
         }
-
-        return $this;
     }
 
-    public function removeDepartment(Department $department): self
+    public function removeDepartment(Department $department): void
     {
         if ($this->departments->removeElement($department)) {
             $department->removeUser($this);
         }
-
-        return $this;
     }
 
     public function getOpenUserId(): ?string
@@ -227,11 +215,9 @@ class User implements \Stringable, UserInterface
         return $this->openUserId;
     }
 
-    public function setOpenUserId(?string $openUserId): self
+    public function setOpenUserId(?string $openUserId): void
     {
         $this->openUserId = $openUserId;
-
-        return $this;
     }
 
     public function getPosition(): ?string
@@ -239,11 +225,9 @@ class User implements \Stringable, UserInterface
         return $this->position;
     }
 
-    public function setPosition(?string $position): self
+    public function setPosition(?string $position): void
     {
         $this->position = $position;
-
-        return $this;
     }
 
     public function getAvatarUrl(): ?string
@@ -251,11 +235,9 @@ class User implements \Stringable, UserInterface
         return $this->avatarUrl;
     }
 
-    public function setAvatarUrl(?string $avatarUrl): self
+    public function setAvatarUrl(?string $avatarUrl): void
     {
         $this->avatarUrl = $avatarUrl;
-
-        return $this;
     }
 
     /**
@@ -266,67 +248,15 @@ class User implements \Stringable, UserInterface
         return $this->tags;
     }
 
-    public function addTag(UserTag $tag): static
+    public function addTag(UserTag $tag): void
     {
         if (!$this->tags->contains($tag)) {
             $this->tags->add($tag);
         }
-
-        return $this;
     }
 
-    public function removeTag(UserTag $tag): static
+    public function removeTag(UserTag $tag): void
     {
         $this->tags->removeElement($tag);
-
-        return $this;
-    }
-
-    public function setCreatedBy(?string $createdBy): self
-    {
-        $this->createdBy = $createdBy;
-
-        return $this;
-    }
-
-    public function getCreatedBy(): ?string
-    {
-        return $this->createdBy;
-    }
-
-    public function setUpdatedBy(?string $updatedBy): self
-    {
-        $this->updatedBy = $updatedBy;
-
-        return $this;
-    }
-
-    public function getUpdatedBy(): ?string
-    {
-        return $this->updatedBy;
-    }
-
-    public function setCreatedFromIp(?string $createdFromIp): self
-    {
-        $this->createdFromIp = $createdFromIp;
-
-        return $this;
-    }
-
-    public function getCreatedFromIp(): ?string
-    {
-        return $this->createdFromIp;
-    }
-
-    public function setUpdatedFromIp(?string $updatedFromIp): self
-    {
-        $this->updatedFromIp = $updatedFromIp;
-
-        return $this;
-    }
-
-    public function getUpdatedFromIp(): ?string
-    {
-        return $this->updatedFromIp;
     }
 }

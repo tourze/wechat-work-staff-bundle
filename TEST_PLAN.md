@@ -9,7 +9,7 @@
 | Service | 1 | ✅ | ✅ |
 | Command | 4 | ✅ | ✅ |
 | Controller | 2 | ✅ | ✅ |
-| Request | 22 | ✅ | ✅ |
+| Request | 21 | ✅ | ✅ |
 | MessageHandler | 1 | ✅ | ✅ |
 | Message | 1 | ✅ | ✅ |
 | Procedure | 2 | ✅ | ✅ |
@@ -66,7 +66,7 @@
 | Auth | 3 | tests/Request/Auth/ | 🔐 认证相关请求 | ✅ | ✅ |
 | Department | 3 | tests/Request/Department/ | 🏢 部门管理请求 | ✅ | ✅ |
 | Tag | 4 | tests/Request/Tag/ | 🏷️ 标签管理请求 | ✅ | ✅ |
-| User | 12 | tests/Request/User/ | 👤 用户管理请求 | ✅ | ✅ |
+| User | 11 | tests/Request/User/ | 👤 用户管理请求 | ✅ | ✅ |
 
 #### Request 详细列表
 
@@ -89,7 +89,7 @@
 - GetTagListRequest ✅
 - UpdateTagRequest ✅
 
-**User 请求 (12 个)**：
+**User 请求 (11 个)**：
 
 - ConvertToOpenIdRequest ✅
 - ConvertToUserIdRequest ✅
@@ -97,7 +97,6 @@
 - DeleteUserRequest ✅
 - GetTagUsersRequest ✅
 - GetUserRequest ✅
-- GetUserSimpleListRequest ✅
 - ListIdRequest ✅
 - UpdateUserRequest ✅
 

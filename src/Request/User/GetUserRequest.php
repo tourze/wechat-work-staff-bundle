@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatWorkStaffBundle\Request\User;
 
 use HttpClientBundle\Request\ApiRequest;

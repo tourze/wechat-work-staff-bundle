@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatWorkStaffBundle\Request\User;
 
 use HttpClientBundle\Request\ApiRequest;
@@ -50,7 +52,7 @@ class CreateUserRequest extends ApiRequest
     private ?string $email;
 
     /**
-     * @var array 成员所属部门id列表，不超过100个
+     * @var array<int, int> 成员所属部门id列表，不超过100个
      */
     private array $department;
 
@@ -59,6 +61,9 @@ class CreateUserRequest extends ApiRequest
         return '/cgi-bin/user/create';
     }
 
+    /**
+     * @return array<string, mixed>|null
+     */
     public function getRequestOptions(): ?array
     {
         $json = [
@@ -158,11 +163,17 @@ class CreateUserRequest extends ApiRequest
         $this->email = $email;
     }
 
+    /**
+     * @return array<int, int>
+     */
     public function getDepartment(): array
     {
         return $this->department;
     }
 
+    /**
+     * @param array<int, int> $department
+     */
     public function setDepartment(array $department): void
     {
         $this->department = $department;

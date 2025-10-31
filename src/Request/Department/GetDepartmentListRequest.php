@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatWorkStaffBundle\Request\Department;
 
 use HttpClientBundle\Request\ApiRequest;
@@ -21,6 +23,9 @@ class GetDepartmentListRequest extends ApiRequest
         return '/cgi-bin/department/list';
     }
 
+    /**
+     * @return array<string, mixed>|null
+     */
     public function getRequestOptions(): ?array
     {
         $query = [];

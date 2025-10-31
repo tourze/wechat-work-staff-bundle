@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatWorkStaffBundle\Request\Tag;
 
 use HttpClientBundle\Request\ApiRequest;

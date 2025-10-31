@@ -1,148 +1,70 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatWorkStaffBundle\Tests\Entity;
 
-use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use Tourze\DoctrineResolveTargetEntityBundle\Testing\TestEntityGenerator;
+use Tourze\PHPUnitDoctrineEntity\AbstractEntityTestCase;
 use Tourze\WechatWorkContracts\AgentInterface;
 use WechatWorkStaffBundle\Entity\AgentUser;
 
-class AgentUserTest extends TestCase
+/**
+ * @internal
+ */
+#[CoversClass(AgentUser::class)]
+final class AgentUserTest extends AbstractEntityTestCase
 {
+    protected function createEntity(): object
+    {
+        return new AgentUser();
+    }
+
+    /**
+     * @return iterable<array{string, mixed}>
+     */
+    public static function propertiesProvider(): iterable
+    {
+        return [
+            'agent' => ['agent', null],
+            'userId' => ['userId', 'user12345'],
+            'openId' => ['openId', 'openid12345'],
+            'createdFromIp' => ['createdFromIp', '192.168.1.100'],
+            'updatedFromIp' => ['updatedFromIp', '10.0.0.50'],
+            'createTime' => ['createTime', new \DateTimeImmutable('2024-01-01 10:00:00')],
+            'updateTime' => ['updateTime', new \DateTimeImmutable('2024-01-02 15:30:00')],
+        ];
+    }
+
     private AgentUser $agentUser;
+
+    private TestEntityGenerator $testEntityGenerator;
 
     protected function setUp(): void
     {
         $this->agentUser = new AgentUser();
-    }
-
-    public function testSetAndGetId(): void
-    {
-        $this->assertNull($this->agentUser->getId());
-    }
-
-    public function testSetAndGetAgent(): void
-    {
-        $agent = $this->createMock(AgentInterface::class);
-
-        $result = $this->agentUser->setAgent($agent);
-        $this->assertSame($this->agentUser, $result);
-        $this->assertSame($agent, $this->agentUser->getAgent());
-    }
-
-    public function testSetAndGetAgentWithNull(): void
-    {
-        $result = $this->agentUser->setAgent(null);
-        $this->assertSame($this->agentUser, $result);
-        $this->assertNull($this->agentUser->getAgent());
-    }
-
-    public function testSetAndGetUserId(): void
-    {
-        $userId = 'test_user_123';
-
-        $result = $this->agentUser->setUserId($userId);
-        $this->assertSame($this->agentUser, $result);
-        $this->assertSame($userId, $this->agentUser->getUserId());
-    }
-
-    public function testSetAndGetUserIdWithEmptyString(): void
-    {
-        $result = $this->agentUser->setUserId('');
-        $this->assertSame($this->agentUser, $result);
-        $this->assertSame('', $this->agentUser->getUserId());
-    }
-
-    public function testSetAndGetOpenId(): void
-    {
-        $openId = 'open_id_123456';
-
-        $result = $this->agentUser->setOpenId($openId);
-        $this->assertSame($this->agentUser, $result);
-        $this->assertSame($openId, $this->agentUser->getOpenId());
-    }
-
-    public function testSetAndGetOpenIdWithEmptyString(): void
-    {
-        $result = $this->agentUser->setOpenId('');
-        $this->assertSame($this->agentUser, $result);
-        $this->assertSame('', $this->agentUser->getOpenId());
-    }
-
-    public function testSetAndGetCreatedFromIp(): void
-    {
-        $ip = '192.168.1.1';
-
-        $result = $this->agentUser->setCreatedFromIp($ip);
-        $this->assertSame($this->agentUser, $result);
-        $this->assertSame($ip, $this->agentUser->getCreatedFromIp());
-    }
-
-    public function testSetAndGetCreatedFromIpWithNull(): void
-    {
-        $result = $this->agentUser->setCreatedFromIp(null);
-        $this->assertSame($this->agentUser, $result);
-        $this->assertNull($this->agentUser->getCreatedFromIp());
-    }
-
-    public function testSetAndGetUpdatedFromIp(): void
-    {
-        $ip = '10.0.0.1';
-
-        $result = $this->agentUser->setUpdatedFromIp($ip);
-        $this->assertSame($this->agentUser, $result);
-        $this->assertSame($ip, $this->agentUser->getUpdatedFromIp());
-    }
-
-    public function testSetAndGetUpdatedFromIpWithNull(): void
-    {
-        $result = $this->agentUser->setUpdatedFromIp(null);
-        $this->assertSame($this->agentUser, $result);
-        $this->assertNull($this->agentUser->getUpdatedFromIp());
-    }
-
-    public function testSetAndGetCreateTime(): void
-    {
-        $dateTime = new \DateTimeImmutable('2024-01-01 12:00:00');
-
-        $this->agentUser->setCreateTime($dateTime);
-        $this->assertSame($dateTime, $this->agentUser->getCreateTime());
-    }
-
-    public function testSetAndGetCreateTimeWithNull(): void
-    {
-        $this->agentUser->setCreateTime(null);
-        $this->assertNull($this->agentUser->getCreateTime());
-    }
-
-    public function testSetAndGetUpdateTime(): void
-    {
-        $dateTime = new \DateTimeImmutable('2024-01-02 15:30:00');
-
-        $this->agentUser->setUpdateTime($dateTime);
-        $this->assertSame($dateTime, $this->agentUser->getUpdateTime());
-    }
-
-    public function testSetAndGetUpdateTimeWithNull(): void
-    {
-        $this->agentUser->setUpdateTime(null);
-        $this->assertNull($this->agentUser->getUpdateTime());
+        $this->testEntityGenerator = new TestEntityGenerator(sys_get_temp_dir() . '/test_entities');
     }
 
     public function testChainedSetters(): void
     {
-        $agent = $this->createMock(AgentInterface::class);
+        /** @var AgentInterface $agent */
+        $agent = $this->testEntityGenerator
+            ->generateTestImplementation(AgentInterface::class)
+        ;
         $userId = 'chain_user';
         $openId = 'chain_open_id';
         $ip = '127.0.0.1';
 
-        $result = $this->agentUser
-            ->setAgent($agent)
-            ->setUserId($userId)
-            ->setOpenId($openId)
-            ->setCreatedFromIp($ip)
-            ->setUpdatedFromIp($ip);
+        // Setter methods now return void, so we need to call them separately
+        $this->agentUser->setAgent($agent);
+        $this->agentUser->setUserId($userId);
+        $this->agentUser->setOpenId($openId);
+        $this->agentUser->setCreatedFromIp($ip);
+        $this->agentUser->setUpdatedFromIp($ip);
 
-        $this->assertSame($this->agentUser, $result);
+        // Verify all properties were set correctly
         $this->assertSame($agent, $this->agentUser->getAgent());
         $this->assertSame($userId, $this->agentUser->getUserId());
         $this->assertSame($openId, $this->agentUser->getOpenId());

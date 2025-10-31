@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatWorkStaffBundle\Request\Department;
 
 use HttpClientBundle\Request\ApiRequest;
@@ -44,6 +46,9 @@ class DepartmentUpdateRequest extends ApiRequest
         return '/cgi-bin/department/update';
     }
 
+    /**
+     * @return array<string, mixed>|null
+     */
     public function getRequestOptions(): ?array
     {
         $json = [

@@ -1,31 +1,65 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatWorkStaffBundle\Tests\Service;
 
-use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use Tourze\PHPUnitSymfonyKernelTest\AbstractIntegrationTestCase;
 use Tourze\UserServiceContracts\UserManagerInterface;
 use Tourze\WechatWorkExternalContactModel\ExternalContactInterface;
 use WechatWorkStaffBundle\Entity\User;
 use WechatWorkStaffBundle\Repository\UserRepository;
 use WechatWorkStaffBundle\Service\BizUserService;
 
-class BizUserServiceTest extends TestCase
+/**
+ * @internal
+ */
+#[CoversClass(BizUserService::class)]
+#[RunTestsInSeparateProcesses]
+final class BizUserServiceTest extends AbstractIntegrationTestCase
 {
-    public function test_constructor_creates_service_instance(): void
+    protected function onSetUp(): void
     {
-        $userManager = $this->createMock(UserManagerInterface::class);
-        $userRepository = $this->createMock(UserRepository::class);
+        // 此测试类不需要特定的设置逻辑
+    }
 
-        $service = new BizUserService($userManager, $userRepository);
+    public function testServiceHasRequiredDependencies(): void
+    {
+        // 验证构造函数参数类型
+        $reflection = new \ReflectionClass(BizUserService::class);
+        $constructor = $reflection->getConstructor();
+        if (null === $constructor) {
+            self::fail('BizUserService constructor should not be null');
+        }
 
+        $parameters = $constructor->getParameters();
+
+        $this->assertCount(2, $parameters);
+        $this->assertEquals('userManager', $parameters[0]->getName());
+        $this->assertEquals('userRepository', $parameters[1]->getName());
+
+        $type0 = $parameters[0]->getType();
+        if ($type0 instanceof \ReflectionNamedType) {
+            $this->assertEquals(UserManagerInterface::class, $type0->getName());
+        }
+
+        $type1 = $parameters[1]->getType();
+        if ($type1 instanceof \ReflectionNamedType) {
+            $this->assertEquals(UserRepository::class, $type1->getName());
+        }
+    }
+
+    public function testConstructorCreatesServiceInstance(): void
+    {
+        $service = self::getService(BizUserService::class);
         $this->assertInstanceOf(BizUserService::class, $service);
     }
 
-    public function test_transform_from_work_user_with_valid_user(): void
+    public function testTransformFromWorkUserWithValidUser(): void
     {
-        $userManager = $this->createMock(UserManagerInterface::class);
-        $userRepository = $this->createMock(UserRepository::class);
-        $service = new BizUserService($userManager, $userRepository);
+        $service = self::getService(BizUserService::class);
 
         $workUser = new User();
         $workUser->setUserId('test_123');
@@ -37,37 +71,32 @@ class BizUserServiceTest extends TestCase
 
         $this->assertCount(1, $parameters);
         $this->assertEquals('user', $parameters[0]->getName());
-        
+
         $type = $parameters[0]->getType();
         if ($type instanceof \ReflectionNamedType) {
             $this->assertEquals(User::class, $type->getName());
         }
     }
 
-    public function test_transform_from_external_user_interface_compatibility(): void
+    public function testTransformFromExternalUserInterfaceCompatibility(): void
     {
-        $userManager = $this->createMock(UserManagerInterface::class);
-        $userRepository = $this->createMock(UserRepository::class);
-        $service = new BizUserService($userManager, $userRepository);
+        $service = self::getService(BizUserService::class);
 
         $reflection = new \ReflectionMethod($service, 'transformFromExternalUser');
         $parameters = $reflection->getParameters();
 
         $this->assertCount(1, $parameters);
         $this->assertEquals('user', $parameters[0]->getName());
-        
+
         $type = $parameters[0]->getType();
         if ($type instanceof \ReflectionNamedType) {
             $this->assertEquals(ExternalContactInterface::class, $type->getName());
         }
     }
 
-    public function test_transform_to_work_user_method_exists(): void
+    public function testTransformToWorkUserMethodExists(): void
     {
-        $userManager = $this->createMock(UserManagerInterface::class);
-        $userRepository = $this->createMock(UserRepository::class);
-        $service = new BizUserService($userManager, $userRepository);
-
+        $service = self::getService(BizUserService::class);
 
         $reflection = new \ReflectionMethod($service, 'transformToWorkUser');
         $parameters = $reflection->getParameters();
@@ -76,32 +105,7 @@ class BizUserServiceTest extends TestCase
         $this->assertEquals('bizUser', $parameters[0]->getName());
     }
 
-    public function test_service_has_required_dependencies(): void
-    {
-        $userManager = $this->createMock(UserManagerInterface::class);
-        $userRepository = $this->createMock(UserRepository::class);
-
-        // 验证构造函数参数类型
-        $reflection = new \ReflectionClass(BizUserService::class);
-        $constructor = $reflection->getConstructor();
-        $parameters = $constructor->getParameters();
-
-        $this->assertCount(2, $parameters);
-        $this->assertEquals('userManager', $parameters[0]->getName());
-        $this->assertEquals('userRepository', $parameters[1]->getName());
-
-        $type0 = $parameters[0]->getType();
-        if ($type0 instanceof \ReflectionNamedType) {
-            $this->assertEquals(UserManagerInterface::class, $type0->getName());
-        }
-        
-        $type1 = $parameters[1]->getType();
-        if ($type1 instanceof \ReflectionNamedType) {
-            $this->assertEquals(UserRepository::class, $type1->getName());
-        }
-    }
-
-    public function test_user_entity_has_required_methods(): void
+    public function testUserEntityHasRequiredMethods(): void
     {
         $user = new User();
 

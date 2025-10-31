@@ -1,100 +1,54 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatWorkStaffBundle\Tests\Command;
 
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
+use Tourze\PHPUnitSymfonyKernelTest\AbstractCommandTestCase;
 use WechatWorkBundle\Repository\AgentRepository;
 use WechatWorkBundle\Service\WorkService;
 use WechatWorkStaffBundle\Command\SyncUserTagsCommand;
 
-class SyncUserTagsCommandTest extends TestCase
+/**
+ * @internal
+ */
+#[CoversClass(SyncUserTagsCommand::class)]
+#[RunTestsInSeparateProcesses]
+final class SyncUserTagsCommandTest extends AbstractCommandTestCase
 {
-    private SyncUserTagsCommand $command;
-    private AgentRepository&MockObject $agentRepository;
-    private WorkService&MockObject $workService;
-    private EntityManagerInterface&MockObject $entityManager;
-    
-    protected function setUp(): void
+    protected function onSetUp(): void
     {
-        $this->agentRepository = $this->createMock(AgentRepository::class);
-        $this->workService = $this->createMock(WorkService::class);
-        $this->entityManager = $this->createMock(EntityManagerInterface::class);
-        
-        $this->command = new SyncUserTagsCommand(
-            $this->agentRepository,
-            $this->workService,
-            $this->entityManager
-        );
+        // 不需要额外的设置，使用服务容器中的实际服务
     }
-    
-    public function testConstructor(): void
+
+    protected function getCommandTester(): CommandTester
     {
-        $this->assertInstanceOf(SyncUserTagsCommand::class, $this->command);
+        // 从服务容器获取命令实例
+        $command = self::getContainer()->get(SyncUserTagsCommand::class);
+        $this->assertInstanceOf(SyncUserTagsCommand::class, $command);
+
+        return new CommandTester($command);
     }
-    
-    public function testCommandConfiguration(): void
+
+    public function testCommandNameConstant(): void
     {
-        $this->assertSame('wechat-work:sync-user-tags', $this->command->getName());
-        $this->assertSame('同步获取成员标签', $this->command->getDescription());
+        // 测试常量是否正确定义
+        $this->assertSame('wechat-work:sync-user-tags', SyncUserTagsCommand::NAME);
     }
-    
-    public function testExecuteWithNoAgents(): void
+
+    public function testCommandCanBeExecutedInTestEnvironment(): void
     {
-        $this->agentRepository->expects($this->once())
-            ->method('findAll')
-            ->willReturn([]);
-        
-        $this->workService->expects($this->never())
-            ->method('request');
-        
-        $this->entityManager->expects($this->never())
-            ->method('persist');
-        
-        $commandTester = new CommandTester($this->command);
-        $result = $commandTester->execute([]);
-        
-        $this->assertSame(0, $result);
-    }
-    
-    public function testBasicCommandExecution(): void
-    {
-        // 简化测试，主要验证命令能够正常执行
-        $this->agentRepository->expects($this->once())
-            ->method('findAll')
-            ->willReturn([]);
-        
-        $commandTester = new CommandTester($this->command);
-        $result = $commandTester->execute([]);
-        
-        $this->assertSame(0, $result);
-        $this->assertStringContainsString('', $commandTester->getDisplay());
-    }
-    
-    public function testCommandReturnsSuccessCode(): void
-    {
-        $this->agentRepository->expects($this->once())
-            ->method('findAll')
-            ->willReturn([]);
-        
-        $commandTester = new CommandTester($this->command);
-        $result = $commandTester->execute([]);
-        
-        // 测试返回成功状态码
-        $this->assertSame(0, $result);
-    }
-    
-    public function testCommandCallsAgentRepository(): void
-    {
-        $this->agentRepository->expects($this->once())
-            ->method('findAll')
-            ->willReturn([]);
-        
-        $commandTester = new CommandTester($this->command);
-        $commandTester->execute([]);
-        
-        // 验证通过了mock expectations
+        $commandTester = $this->getCommandTester();
+
+        $exitCode = $commandTester->execute([]);
+
+        // 由于有 Mock 的服务，命令应该成功执行
+        $this->assertSame(Command::SUCCESS, $exitCode);
     }
 }

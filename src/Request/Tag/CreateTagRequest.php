@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatWorkStaffBundle\Request\Tag;
 
 use HttpClientBundle\Request\ApiRequest;
@@ -29,6 +31,9 @@ class CreateTagRequest extends ApiRequest
         return '/cgi-bin/user/delete';
     }
 
+    /**
+     * @return array<string, mixed>|null
+     */
     public function getRequestOptions(): ?array
     {
         $json = [

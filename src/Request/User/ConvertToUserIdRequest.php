@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatWorkStaffBundle\Request\User;
 
 use HttpClientBundle\Request\ApiRequest;
@@ -27,6 +29,9 @@ class ConvertToUserIdRequest extends ApiRequest
         return '/cgi-bin/user/convert_to_userid';
     }
 
+    /**
+     * @return array<string, mixed>|null
+     */
     public function getRequestOptions(): ?array
     {
         return [

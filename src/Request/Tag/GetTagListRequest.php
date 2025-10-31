@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatWorkStaffBundle\Request\Tag;
 
 use HttpClientBundle\Request\ApiRequest;
@@ -19,6 +21,9 @@ class GetTagListRequest extends ApiRequest
         return '/cgi-bin/tag/list';
     }
 
+    /**
+     * @return array<string, mixed>|null
+     */
     public function getRequestOptions(): ?array
     {
         return [];

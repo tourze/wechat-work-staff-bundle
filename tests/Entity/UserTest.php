@@ -1,23 +1,63 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatWorkStaffBundle\Tests\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
-use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use Tourze\DoctrineResolveTargetEntityBundle\Testing\TestEntityGenerator;
+use Tourze\PHPUnitDoctrineEntity\AbstractEntityTestCase;
 use Tourze\WechatWorkContracts\AgentInterface;
 use Tourze\WechatWorkContracts\CorpInterface;
 use WechatWorkStaffBundle\Entity\Department;
 use WechatWorkStaffBundle\Entity\User;
 use WechatWorkStaffBundle\Entity\UserTag;
 
-class UserTest extends TestCase
+/**
+ * @internal
+ */
+#[CoversClass(User::class)]
+final class UserTest extends AbstractEntityTestCase
 {
+    protected function createEntity(): object
+    {
+        return new User();
+    }
+
+    /**
+     * @return array<string, array{string, mixed}>
+     */
+    public static function propertiesProvider(): array
+    {
+        return [
+            'corp' => ['corp', null],
+            'agent' => ['agent', null],
+            'userId' => ['userId', 'zhangsan'],
+            'name' => ['name', '张三'],
+            'alias' => ['alias', '小张'],
+            'position' => ['position', '工程师'],
+            'mobile' => ['mobile', '13800138000'],
+            'email' => ['email', 'zhangsan@example.com'],
+            'openUserId' => ['openUserId', 'openid123'],
+            'avatarUrl' => ['avatarUrl', 'https://example.com/avatar.jpg'],
+            'createdBy' => ['createdBy', 'admin'],
+            'updatedBy' => ['updatedBy', 'hr'],
+            'createdFromIp' => ['createdFromIp', '192.168.1.150'],
+            'updatedFromIp' => ['updatedFromIp', '10.0.0.75'],
+            'createTime' => ['createTime', new \DateTimeImmutable('2024-01-01 08:00:00')],
+            'updateTime' => ['updateTime', new \DateTimeImmutable('2024-01-02 16:00:00')],
+        ];
+    }
+
     private User $user;
+
+    private TestEntityGenerator $testEntityGenerator;
 
     protected function setUp(): void
     {
         $this->user = new User();
+        $this->testEntityGenerator = new TestEntityGenerator(sys_get_temp_dir() . '/test_entities');
     }
 
     public function testConstructor(): void
@@ -30,8 +70,8 @@ class UserTest extends TestCase
 
     public function testToStringWhenIdIsNull(): void
     {
-        // ID初始值是0，没有name和userId，所以会返回 "()"
-        $this->assertSame('()', (string)$this->user);
+        // ID初始值是0，当ID为0时返回空字符串
+        $this->assertSame('', (string) $this->user);
     }
 
     public function testToStringWithIdUserIdAndName(): void
@@ -45,166 +85,14 @@ class UserTest extends TestCase
         $property->setAccessible(true);
         $property->setValue($this->user, 123);
 
-        $this->assertSame('测试用户(test_user)', (string)$this->user);
-    }
-
-    public function testSetAndGetId(): void
-    {
-        $this->assertSame(0, $this->user->getId());
-    }
-
-    public function testSetAndGetCorp(): void
-    {
-        $corp = $this->createMock(CorpInterface::class);
-
-        $result = $this->user->setCorp($corp);
-        $this->assertSame($this->user, $result);
-        $this->assertSame($corp, $this->user->getCorp());
-    }
-
-    public function testSetAndGetCorpWithNull(): void
-    {
-        $result = $this->user->setCorp(null);
-        $this->assertSame($this->user, $result);
-        $this->assertNull($this->user->getCorp());
-    }
-
-    public function testSetAndGetAgent(): void
-    {
-        $agent = $this->createMock(AgentInterface::class);
-
-        $result = $this->user->setAgent($agent);
-        $this->assertSame($this->user, $result);
-        $this->assertSame($agent, $this->user->getAgent());
-    }
-
-    public function testSetAndGetAgentWithNull(): void
-    {
-        $result = $this->user->setAgent(null);
-        $this->assertSame($this->user, $result);
-        $this->assertNull($this->user->getAgent());
-    }
-
-    public function testSetAndGetUserId(): void
-    {
-        $userId = 'employee123';
-
-        $result = $this->user->setUserId($userId);
-        $this->assertSame($this->user, $result);
-        $this->assertSame($userId, $this->user->getUserId());
-    }
-
-    public function testSetAndGetName(): void
-    {
-        $name = '张三';
-
-        $result = $this->user->setName($name);
-        $this->assertSame($this->user, $result);
-        $this->assertSame($name, $this->user->getName());
-    }
-
-    public function testSetAndGetAlias(): void
-    {
-        $alias = '小张';
-
-        $result = $this->user->setAlias($alias);
-        $this->assertSame($this->user, $result);
-        $this->assertSame($alias, $this->user->getAlias());
-    }
-
-    public function testSetAndGetAliasWithNull(): void
-    {
-        $result = $this->user->setAlias(null);
-        $this->assertSame($this->user, $result);
-        $this->assertNull($this->user->getAlias());
-    }
-
-    public function testSetAndGetPosition(): void
-    {
-        $position = '软件工程师';
-
-        $result = $this->user->setPosition($position);
-        $this->assertSame($this->user, $result);
-        $this->assertSame($position, $this->user->getPosition());
-    }
-
-    public function testSetAndGetPositionWithNull(): void
-    {
-        $result = $this->user->setPosition(null);
-        $this->assertSame($this->user, $result);
-        $this->assertNull($this->user->getPosition());
-    }
-
-    public function testSetAndGetMobile(): void
-    {
-        $mobile = '13800138000';
-
-        $result = $this->user->setMobile($mobile);
-        $this->assertSame($this->user, $result);
-        $this->assertSame($mobile, $this->user->getMobile());
-    }
-
-    public function testSetAndGetMobileWithNull(): void
-    {
-        $result = $this->user->setMobile(null);
-        $this->assertSame($this->user, $result);
-        $this->assertNull($this->user->getMobile());
-    }
-
-    public function testSetAndGetEmail(): void
-    {
-        $email = 'test@example.com';
-
-        $result = $this->user->setEmail($email);
-        $this->assertSame($this->user, $result);
-        $this->assertSame($email, $this->user->getEmail());
-    }
-
-    public function testSetAndGetEmailWithNull(): void
-    {
-        $result = $this->user->setEmail(null);
-        $this->assertSame($this->user, $result);
-        $this->assertNull($this->user->getEmail());
-    }
-
-    public function testSetAndGetOpenUserId(): void
-    {
-        $openUserId = 'open_user_id_123';
-
-        $result = $this->user->setOpenUserId($openUserId);
-        $this->assertSame($this->user, $result);
-        $this->assertSame($openUserId, $this->user->getOpenUserId());
-    }
-
-    public function testSetAndGetOpenUserIdWithNull(): void
-    {
-        $result = $this->user->setOpenUserId(null);
-        $this->assertSame($this->user, $result);
-        $this->assertNull($this->user->getOpenUserId());
-    }
-
-    public function testSetAndGetAvatarUrl(): void
-    {
-        $avatarUrl = 'https://example.com/avatar.jpg';
-
-        $result = $this->user->setAvatarUrl($avatarUrl);
-        $this->assertSame($this->user, $result);
-        $this->assertSame($avatarUrl, $this->user->getAvatarUrl());
-    }
-
-    public function testSetAndGetAvatarUrlWithNull(): void
-    {
-        $result = $this->user->setAvatarUrl(null);
-        $this->assertSame($this->user, $result);
-        $this->assertNull($this->user->getAvatarUrl());
+        $this->assertSame('测试用户(test_user)', (string) $this->user);
     }
 
     public function testAddDepartment(): void
     {
         $department = new Department();
 
-        $result = $this->user->addDepartment($department);
-        $this->assertSame($this->user, $result);
+        $this->user->addDepartment($department);
         $this->assertCount(1, $this->user->getDepartments());
         $this->assertTrue($this->user->getDepartments()->contains($department));
     }
@@ -224,8 +112,7 @@ class UserTest extends TestCase
         $department = new Department();
         $this->user->addDepartment($department);
 
-        $result = $this->user->removeDepartment($department);
-        $this->assertSame($this->user, $result);
+        $this->user->removeDepartment($department);
         $this->assertCount(0, $this->user->getDepartments());
     }
 
@@ -233,8 +120,7 @@ class UserTest extends TestCase
     {
         $tag = new UserTag();
 
-        $result = $this->user->addTag($tag);
-        $this->assertSame($this->user, $result);
+        $this->user->addTag($tag);
         $this->assertCount(1, $this->user->getTags());
         $this->assertTrue($this->user->getTags()->contains($tag));
     }
@@ -254,101 +140,8 @@ class UserTest extends TestCase
         $tag = new UserTag();
         $this->user->addTag($tag);
 
-        $result = $this->user->removeTag($tag);
-        $this->assertSame($this->user, $result);
+        $this->user->removeTag($tag);
         $this->assertCount(0, $this->user->getTags());
-    }
-
-    public function testSetAndGetCreatedBy(): void
-    {
-        $createdBy = 'admin';
-
-        $result = $this->user->setCreatedBy($createdBy);
-        $this->assertSame($this->user, $result);
-        $this->assertSame($createdBy, $this->user->getCreatedBy());
-    }
-
-    public function testSetAndGetCreatedByWithNull(): void
-    {
-        $result = $this->user->setCreatedBy(null);
-        $this->assertSame($this->user, $result);
-        $this->assertNull($this->user->getCreatedBy());
-    }
-
-    public function testSetAndGetUpdatedBy(): void
-    {
-        $updatedBy = 'moderator';
-
-        $result = $this->user->setUpdatedBy($updatedBy);
-        $this->assertSame($this->user, $result);
-        $this->assertSame($updatedBy, $this->user->getUpdatedBy());
-    }
-
-    public function testSetAndGetUpdatedByWithNull(): void
-    {
-        $result = $this->user->setUpdatedBy(null);
-        $this->assertSame($this->user, $result);
-        $this->assertNull($this->user->getUpdatedBy());
-    }
-
-    public function testSetAndGetCreatedFromIp(): void
-    {
-        $ip = '192.168.1.200';
-
-        $result = $this->user->setCreatedFromIp($ip);
-        $this->assertSame($this->user, $result);
-        $this->assertSame($ip, $this->user->getCreatedFromIp());
-    }
-
-    public function testSetAndGetCreatedFromIpWithNull(): void
-    {
-        $result = $this->user->setCreatedFromIp(null);
-        $this->assertSame($this->user, $result);
-        $this->assertNull($this->user->getCreatedFromIp());
-    }
-
-    public function testSetAndGetUpdatedFromIp(): void
-    {
-        $ip = '10.0.0.75';
-
-        $result = $this->user->setUpdatedFromIp($ip);
-        $this->assertSame($this->user, $result);
-        $this->assertSame($ip, $this->user->getUpdatedFromIp());
-    }
-
-    public function testSetAndGetUpdatedFromIpWithNull(): void
-    {
-        $result = $this->user->setUpdatedFromIp(null);
-        $this->assertSame($this->user, $result);
-        $this->assertNull($this->user->getUpdatedFromIp());
-    }
-
-    public function testSetAndGetCreateTime(): void
-    {
-        $dateTime = new \DateTimeImmutable('2024-01-01 09:00:00');
-
-        $this->user->setCreateTime($dateTime);
-        $this->assertSame($dateTime, $this->user->getCreateTime());
-    }
-
-    public function testSetAndGetCreateTimeWithNull(): void
-    {
-        $this->user->setCreateTime(null);
-        $this->assertNull($this->user->getCreateTime());
-    }
-
-    public function testSetAndGetUpdateTime(): void
-    {
-        $dateTime = new \DateTimeImmutable('2024-01-02 16:45:00');
-
-        $this->user->setUpdateTime($dateTime);
-        $this->assertSame($dateTime, $this->user->getUpdateTime());
-    }
-
-    public function testSetAndGetUpdateTimeWithNull(): void
-    {
-        $this->user->setUpdateTime(null);
-        $this->assertNull($this->user->getUpdateTime());
     }
 
     public function testUserDepartmentAndTagAssociations(): void
@@ -381,20 +174,25 @@ class UserTest extends TestCase
 
     public function testCompleteUserProfile(): void
     {
-        $corp = $this->createMock(CorpInterface::class);
-        $agent = $this->createMock(AgentInterface::class);
+        /** @var CorpInterface $corp */
+        $corp = $this->testEntityGenerator
+            ->generateTestImplementation(CorpInterface::class)
+        ;
+        /** @var AgentInterface $agent */
+        $agent = $this->testEntityGenerator
+            ->generateTestImplementation(AgentInterface::class)
+        ;
 
-        $this->user
-            ->setCorp($corp)
-            ->setAgent($agent)
-            ->setUserId('complete_user')
-            ->setName('完整用户')
-            ->setAlias('全量')
-            ->setPosition('架构师')
-            ->setMobile('13900139000')
-            ->setEmail('complete@example.com')
-            ->setOpenUserId('open_complete_123')
-            ->setAvatarUrl('https://example.com/complete.jpg');
+        $this->user->setCorp($corp);
+        $this->user->setAgent($agent);
+        $this->user->setUserId('complete_user');
+        $this->user->setName('完整用户');
+        $this->user->setAlias('全量');
+        $this->user->setPosition('架构师');
+        $this->user->setMobile('13900139000');
+        $this->user->setEmail('complete@example.com');
+        $this->user->setOpenUserId('open_complete_123');
+        $this->user->setAvatarUrl('https://example.com/complete.jpg');
 
         $this->assertSame($corp, $this->user->getCorp());
         $this->assertSame($agent, $this->user->getAgent());
@@ -408,145 +206,20 @@ class UserTest extends TestCase
         $this->assertSame('https://example.com/complete.jpg', $this->user->getAvatarUrl());
     }
 
-    public function test_user_entity_implements_stringable(): void
+    public function testUserEntityImplementsStringable(): void
     {
-        $this->assertInstanceOf(\Stringable::class, $this->user);
+        // 测试__toString方法是否存在并可以调用
 
         $this->user->setUserId('test_user');
         $this->user->setName('测试用户');
 
+        // 使用反射设置ID为非零值，这样__toString才会返回有效字符串
+        $reflection = new \ReflectionClass($this->user);
+        $property = $reflection->getProperty('id');
+        $property->setAccessible(true);
+        $property->setValue($this->user, 1);
+
         $stringRepresentation = (string) $this->user;
         $this->assertNotEmpty($stringRepresentation);
-    }
-
-    public function test_user_id_operations(): void
-    {
-        $userId = 'user_123456';
-
-        $this->user->setUserId($userId);
-        $this->assertEquals($userId, $this->user->getUserId());
-    }
-
-    public function test_user_name_operations(): void
-    {
-        $name = '张三';
-
-        $this->user->setName($name);
-        $this->assertEquals($name, $this->user->getName());
-    }
-
-    public function test_user_alias_operations(): void
-    {
-        $alias = 'zhangsan';
-
-        $this->user->setAlias($alias);
-        $this->assertEquals($alias, $this->user->getAlias());
-
-        // 测试空值
-        $this->user->setAlias(null);
-        $this->assertNull($this->user->getAlias());
-    }
-
-    public function test_user_contact_info_operations(): void
-    {
-        $mobile = '13800138000';
-        $email = 'zhangsan@example.com';
-
-        $this->user->setMobile($mobile);
-        $this->user->setEmail($email);
-
-        $this->assertEquals($mobile, $this->user->getMobile());
-        $this->assertEquals($email, $this->user->getEmail());
-    }
-
-    public function test_user_avatar_operations(): void
-    {
-        $avatarUrl = 'https://example.com/avatar/zhangsan.jpg';
-
-        $this->user->setAvatarUrl($avatarUrl);
-        $this->assertEquals($avatarUrl, $this->user->getAvatarUrl());
-    }
-
-    public function test_user_position_operations(): void
-    {
-        $position = '软件工程师';
-
-        $this->user->setPosition($position);
-        $this->assertEquals($position, $this->user->getPosition());
-    }
-
-    public function test_user_open_user_id_operations(): void
-    {
-        $openUserId = 'open_user_123456';
-
-        $this->user->setOpenUserId($openUserId);
-        $this->assertEquals($openUserId, $this->user->getOpenUserId());
-
-        // 测试空值
-        $this->user->setOpenUserId(null);
-        $this->assertNull($this->user->getOpenUserId());
-    }
-
-    public function test_user_departments_collection(): void
-    {
-        $departments = $this->user->getDepartments();
-
-        $this->assertInstanceOf(Collection::class, $departments);
-        $this->assertTrue($departments->isEmpty());
-
-        // 测试添加部门
-        $department = new Department();
-        $department->setName('技术部');
-
-        $this->user->addDepartment($department);
-        $this->assertCount(1, $this->user->getDepartments());
-        $this->assertTrue($this->user->getDepartments()->contains($department));
-
-        // 测试移除部门
-        $this->user->removeDepartment($department);
-        $this->assertCount(0, $this->user->getDepartments());
-        $this->assertFalse($this->user->getDepartments()->contains($department));
-    }
-
-    public function test_user_tags_collection(): void
-    {
-        $tags = $this->user->getTags();
-
-        $this->assertInstanceOf(Collection::class, $tags);
-        $this->assertTrue($tags->isEmpty());
-
-        // 测试添加标签
-        $tag = new UserTag();
-        $tag->setName('VIP客户');
-
-        $this->user->addTag($tag);
-        $this->assertCount(1, $this->user->getTags());
-        $this->assertTrue($this->user->getTags()->contains($tag));
-
-        // 测试移除标签
-        $this->user->removeTag($tag);
-        $this->assertCount(0, $this->user->getTags());
-        $this->assertFalse($this->user->getTags()->contains($tag));
-    }
-
-    public function test_user_entity_properties_with_null_values(): void
-    {
-        // 测试可为空的属性
-        $this->assertNull($this->user->getAlias());
-        $this->assertNull($this->user->getPosition());
-        $this->assertNull($this->user->getMobile());
-        $this->assertNull($this->user->getEmail());
-        $this->assertNull($this->user->getAvatarUrl());
-    }
-
-    public function test_user_entity_required_properties(): void
-    {
-        // 测试必填属性的默认值
-        $this->assertNull($this->user->getUserId());
-        $this->assertNull($this->user->getName());
-
-        // 测试有默认值的属性
-        $this->assertNotNull($this->user->getDepartments());
-        $this->assertNotNull($this->user->getTags());
     }
 }

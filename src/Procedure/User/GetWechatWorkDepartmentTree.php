@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatWorkStaffBundle\Procedure\User;
 
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -42,14 +44,4 @@ class GetWechatWorkDepartmentTree extends BaseProcedure
             'tree' => $tree,
         ];
     }
-
-    //    public function getMockResult(): ?array
-    //    {
-    //        // TODO 生成
-    //        return [
-    //            'tree' => [
-    //                $this->faker->title,
-    //            ],
-    //        ];
-    //    }
 }

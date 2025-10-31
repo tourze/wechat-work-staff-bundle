@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatWorkStaffBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -11,11 +14,12 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use WechatWorkBundle\Repository\AgentRepository;
 use WechatWorkBundle\Repository\CorpRepository;
 
-class ConnectRedirectController extends AbstractController
+#[Autoconfigure(public: true)]
+final class ConnectRedirectController extends AbstractController
 {
     public function __construct(
-        private readonly CorpRepository $corpRepository,
-        private readonly AgentRepository $agentRepository,
+        private readonly ?CorpRepository $corpRepository = null,
+        private readonly ?AgentRepository $agentRepository = null,
     ) {
     }
 
@@ -25,12 +29,20 @@ class ConnectRedirectController extends AbstractController
         string $agentId,
         Request $request,
     ): Response {
+        if (null === $this->corpRepository || null === $this->agentRepository) {
+            throw new NotFoundHttpException('服务不可用');
+        }
+
         $corp = $this->corpRepository->findOneBy(['corpId' => $corpId]);
+        if (null === $corp) {
+            throw new NotFoundHttpException('找不到指定企业');
+        }
+
         $agent = $this->agentRepository->findOneBy([
             'corp' => $corp,
             'agentId' => $agentId,
         ]);
-        if ($agent === null) {
+        if (null === $agent) {
             throw new NotFoundHttpException('找不到指定应用');
         }
 
