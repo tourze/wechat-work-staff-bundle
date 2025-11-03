@@ -17,6 +17,7 @@ use Tourze\WechatWorkContracts\UserInterface;
 use WechatWorkBundle\WechatWorkBundle;
 use WechatWorkStaffBundle\Entity\Department;
 use WechatWorkStaffBundle\Entity\User;
+use Tourze\EasyAdminMenuBundle\EasyAdminMenuBundle;
 
 class WechatWorkStaffBundle extends Bundle implements BundleDependencyInterface
 {
@@ -44,6 +45,7 @@ class WechatWorkStaffBundle extends Bundle implements BundleDependencyInterface
             RoutingAutoLoaderBundle::class => ['all' => true],
             WechatWorkBundle::class => ['all' => true],
             JsonRPCSecurityBundle::class => ['all' => true],
+            EasyAdminMenuBundle::class => ['all' => true],
         ];
     }
 }
