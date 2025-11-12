@@ -63,7 +63,6 @@ class CheckUserAvatarCommand extends Command
         $like1 = $qb->expr()->like('u.avatarUrl', $qb->expr()->literal('https://thirdwx.qlogo.cn/%'));
         $like2 = $qb->expr()->like('u.avatarUrl', $qb->expr()->literal('https://wx.qlogo.cn/mmopen%'));
 
-        // @phpstan-ignore-next-line return.type
         return $qb->where("u.avatarUrl != '' and u.avatarUrl is not null")
             ->andWhere($like1)
             ->orWhere($like2)
