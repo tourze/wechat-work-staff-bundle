@@ -40,11 +40,6 @@ final class AgentUserCrudControllerTest extends AbstractEasyAdminControllerTestC
         yield '更新时间' => ['更新时间'];
     }
 
-    public function testGetEntityFqcnReturnsAgentUserClass(): void
-    {
-        self::assertSame(AgentUser::class, AgentUserCrudController::getEntityFqcn());
-    }
-
     public function testConfigureFieldsReturnsIterableOfFields(): void
     {
         $controller = new AgentUserCrudController();

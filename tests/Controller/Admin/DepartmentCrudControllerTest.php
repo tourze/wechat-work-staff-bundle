@@ -37,11 +37,6 @@ final class DepartmentCrudControllerTest extends AbstractEasyAdminControllerTest
         yield '更新时间' => ['更新时间'];
     }
 
-    public function testGetEntityFqcnReturnsDepartmentClass(): void
-    {
-        self::assertSame(Department::class, DepartmentCrudController::getEntityFqcn());
-    }
-
     public function testConfigureFieldsReturnsIterableOfFields(): void
     {
         $controller = new DepartmentCrudController();

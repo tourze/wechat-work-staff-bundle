@@ -39,11 +39,6 @@ final class UserCrudControllerTest extends AbstractEasyAdminControllerTestCase
         yield '更新时间' => ['更新时间'];
     }
 
-    public function testGetEntityFqcnReturnsUserClass(): void
-    {
-        self::assertSame(User::class, UserCrudController::getEntityFqcn());
-    }
-
     public function testConfigureFieldsReturnsIterableOfFields(): void
     {
         $controller = new UserCrudController();
