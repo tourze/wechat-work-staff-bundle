@@ -11,14 +11,17 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Tourze\JsonRPC\Core\Attribute\MethodDoc;
 use Tourze\JsonRPC\Core\Attribute\MethodExpose;
 use Tourze\JsonRPC\Core\Attribute\MethodTag;
+use Tourze\JsonRPC\Core\Contracts\RpcParamInterface;
 use Tourze\JsonRPC\Core\Procedure\BaseProcedure;
+use Tourze\JsonRPC\Core\Result\ArrayResult;
+use WechatWorkStaffBundle\Param\GetWechatWorkDepartmentTreeParam;
 use WechatWorkStaffBundle\Repository\DepartmentRepository;
 
 #[MethodTag(name: '企业微信')]
 #[MethodDoc(summary: '获取企业微信组织结构树')]
 #[MethodExpose(method: 'GetWechatWorkDepartmentTree')]
 #[IsGranted(attribute: 'IS_AUTHENTICATED_FULLY')]
-class GetWechatWorkDepartmentTree extends BaseProcedure
+final class GetWechatWorkDepartmentTree extends BaseProcedure
 {
     public function __construct(
         private readonly DepartmentRepository $departmentRepository,
@@ -26,7 +29,10 @@ class GetWechatWorkDepartmentTree extends BaseProcedure
     ) {
     }
 
-    public function execute(): array
+    /**
+     * @phpstan-param GetWechatWorkDepartmentTreeParam $param
+     */
+    public function execute(GetWechatWorkDepartmentTreeParam|RpcParamInterface $param): ArrayResult
     {
         $tree = [];
         foreach ($this->departmentRepository->findBy(['parent' => null]) as $item) {
@@ -40,8 +46,8 @@ class GetWechatWorkDepartmentTree extends BaseProcedure
             $tree[] = $tmp;
         }
 
-        return [
+        return new ArrayResult([
             'tree' => $tree,
-        ];
+        ]);
     }
 }

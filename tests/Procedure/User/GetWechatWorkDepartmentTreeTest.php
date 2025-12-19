@@ -6,7 +6,9 @@ namespace WechatWorkStaffBundle\Tests\Procedure\User;
 
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
-use Tourze\JsonRPC\Core\Tests\AbstractProcedureTestCase;
+use Tourze\JsonRPC\Core\Result\ArrayResult;
+use Tourze\PHPUnitJsonRPC\AbstractProcedureTestCase;
+use WechatWorkStaffBundle\Param\GetWechatWorkDepartmentTreeParam;
 use WechatWorkStaffBundle\Procedure\User\GetWechatWorkDepartmentTree;
 
 /**
@@ -31,16 +33,20 @@ final class GetWechatWorkDepartmentTreeTest extends AbstractProcedureTestCase
         /** @var GetWechatWorkDepartmentTree $procedure */
         $procedure = self::getService(GetWechatWorkDepartmentTree::class);
 
-        $result = $procedure->execute();
+        $result = $procedure->execute(new GetWechatWorkDepartmentTreeParam());
 
-        // 验证返回的结构包含tree键
-        $this->assertIsArray($result);
-        $this->assertArrayHasKey('tree', $result);
-        $this->assertIsArray($result['tree']);
+        // 验证返回的是 ArrayResult 对象
+        $this->assertInstanceOf(ArrayResult::class, $result);
+
+        // 获取实际的数据数组
+        $data = $result->toArray();
+        $this->assertIsArray($data);
+        $this->assertArrayHasKey('tree', $data);
+        $this->assertIsArray($data['tree']);
 
         // 由于这是集成测试，tree可能为空或包含真实的部门数据
         // 但至少应该是一个数组结构
-        foreach ($result['tree'] as $departmentData) {
+        foreach ($data['tree'] as $departmentData) {
             $this->assertIsArray($departmentData);
         }
     }
@@ -51,14 +57,16 @@ final class GetWechatWorkDepartmentTreeTest extends AbstractProcedureTestCase
         $procedure = self::getService(GetWechatWorkDepartmentTree::class);
 
         // 测试方法能正常执行而不抛出异常
-        $result = $procedure->execute();
+        $result = $procedure->execute(new GetWechatWorkDepartmentTreeParam());
 
         // 验证基本结构
-        $this->assertIsArray($result);
-        $this->assertArrayHasKey('tree', $result);
+        $this->assertInstanceOf(ArrayResult::class, $result);
+        $data = $result->toArray();
+        $this->assertIsArray($data);
+        $this->assertArrayHasKey('tree', $data);
 
         // 验证每个部门数据的基本结构（如果存在的话）
-        $tree = $result['tree'];
+        $tree = $data['tree'];
         if (is_array($tree)) {
             foreach ($tree as $departmentData) {
                 $this->assertIsArray($departmentData);

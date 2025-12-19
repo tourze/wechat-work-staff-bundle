@@ -58,7 +58,7 @@ final class MockLinkGeneratorTest extends TestCase
 
         $result = $generator->extractEntityFqcn('/admin/test/entity/crud/Test/Entity/User');
 
-        $this->assertEquals('Test\\Entity\\User', $result);
+        $this->assertEquals('Test\Entity\User', $result);
     }
 
     public function testExtractEntityFqcnWithInvalidUrl(): void
@@ -74,9 +74,9 @@ final class MockLinkGeneratorTest extends TestCase
     {
         $generator = new MockLinkGenerator();
 
-        $generator->setDashboard('Test\\DashboardController');
+        $generator->setDashboard('Test\DashboardController');
 
-        $this->assertEquals('Test\\DashboardController', $generator->getDefaultDashboard());
+        $this->assertEquals('Test\DashboardController', $generator->getDefaultDashboard());
     }
 
     public function testGetDefaultDashboardWhenNotSet(): void

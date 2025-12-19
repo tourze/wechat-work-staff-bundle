@@ -19,7 +19,7 @@ use WechatWorkStaffBundle\Entity\User;
  */
 #[AsAlias(id: UserLoaderInterface::class)]
 #[AsRepository(entityClass: User::class)]
-class UserRepository extends ServiceEntityRepository implements UserLoaderInterface
+final class UserRepository extends ServiceEntityRepository implements UserLoaderInterface
 {
     public function __construct(ManagerRegistry $registry)
     {

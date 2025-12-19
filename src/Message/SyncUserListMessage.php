@@ -7,7 +7,7 @@ namespace WechatWorkStaffBundle\Message;
 /**
  * 因为引用必然是关联 corp 的，所以这里我们没单独新增一个 corpId
  */
-class SyncUserListMessage
+final class SyncUserListMessage
 {
     /**
      * @var int 应用ID

@@ -20,7 +20,7 @@ use WechatWorkStaffBundle\Request\Tag\GetTagListRequest;
 #[Autoconfigure(public: true)]
 #[AsCronTask(expression: '30 */8 * * *')]
 #[AsCommand(name: self::NAME, description: '同步获取成员标签')]
-class SyncUserTagsCommand extends Command
+final class SyncUserTagsCommand extends Command
 {
     public const NAME = 'wechat-work:sync-user-tags';
 

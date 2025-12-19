@@ -21,7 +21,7 @@ use WechatWorkStaffBundle\Service\BizUserService;
 
 #[Autoconfigure(public: true)]
 #[AsMessageHandler]
-class SyncUserListHandler
+final class SyncUserListHandler
 {
     public function __construct(
         private readonly ?AgentRepository $agentRepository = null,

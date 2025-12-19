@@ -21,7 +21,7 @@ use WechatWorkStaffBundle\Repository\UserRepository;
 #[AsCronTask(expression: '14 */8 * * *')]
 #[AsCommand(name: self::NAME, description: '检查用户头像并保存')]
 #[Autoconfigure(public: true)]
-class CheckUserAvatarCommand extends Command
+final class CheckUserAvatarCommand extends Command
 {
     public const NAME = 'wechat-work:check-user-avatar';
 

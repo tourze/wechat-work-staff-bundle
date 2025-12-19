@@ -13,9 +13,10 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Tourze\AccessTokenContracts\TokenServiceInterface;
 use Tourze\JsonRPC\Core\Attribute\MethodDoc;
 use Tourze\JsonRPC\Core\Attribute\MethodExpose;
-use Tourze\JsonRPC\Core\Attribute\MethodParam;
 use Tourze\JsonRPC\Core\Attribute\MethodTag;
+use Tourze\JsonRPC\Core\Contracts\RpcParamInterface;
 use Tourze\JsonRPC\Core\Procedure\BaseProcedure;
+use Tourze\JsonRPC\Core\Result\ArrayResult;
 use Tourze\JsonRPCLogBundle\Attribute\Log;
 use Tourze\WechatWorkContracts\AgentInterface;
 use Tourze\WechatWorkContracts\CorpInterface;
@@ -24,6 +25,7 @@ use WechatWorkBundle\Repository\AgentRepository;
 use WechatWorkBundle\Repository\CorpRepository;
 use WechatWorkBundle\Service\WorkServiceInterface;
 use WechatWorkStaffBundle\Entity\User;
+use WechatWorkStaffBundle\Param\GetWechatWorkUserByAuthCodeParam;
 use WechatWorkStaffBundle\Request\Auth\GetUserDetailByTicketRequest;
 use WechatWorkStaffBundle\Request\Auth\GetUserInfoByCodeRequest;
 use WechatWorkStaffBundle\Request\User\GetUserRequest;
@@ -35,17 +37,8 @@ use WechatWorkStaffBundle\Service\BizUserService;
 #[MethodExpose(method: 'GetWechatWorkUserByAuthCode')]
 #[MethodDoc(summary: '根据企业微信返回的Code来获取用户信息')]
 #[WithMonologChannel(channel: 'procedure')]
-class GetWechatWorkUserByAuthCode extends BaseProcedure
+final class GetWechatWorkUserByAuthCode extends BaseProcedure
 {
-    #[MethodParam(description: '企业ID')]
-    public string $corpId;
-
-    #[MethodParam(description: '应用ID')]
-    public string $agentId;
-
-    #[MethodParam(description: '授权Code')]
-    public string $code;
-
     public function __construct(
         private readonly ?CorpRepository $corpRepository = null,
         private readonly ?AgentRepository $agentRepository = null,
@@ -58,9 +51,12 @@ class GetWechatWorkUserByAuthCode extends BaseProcedure
     ) {
     }
 
-    public function execute(): array
+    /**
+     * @phpstan-param GetWechatWorkUserByAuthCodeParam $param
+     */
+    public function execute(GetWechatWorkUserByAuthCodeParam|RpcParamInterface $param): ArrayResult
     {
-        return $this->getResult($this->corpId, $this->agentId, $this->code);
+        return new ArrayResult($this->getResult($param->corpId, $param->agentId, $param->code));
     }
 
     /**

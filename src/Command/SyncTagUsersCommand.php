@@ -24,7 +24,7 @@ use WechatWorkStaffBundle\Request\User\GetTagUsersRequest;
 #[AsCronTask(expression: '*/20 * * * *')]
 #[AsCommand(name: self::NAME, description: '同步获取标签成员')]
 #[Autoconfigure(public: true)]
-class SyncTagUsersCommand extends Command
+final class SyncTagUsersCommand extends Command
 {
     public const NAME = 'wechat-work:sync-tag-users';
 

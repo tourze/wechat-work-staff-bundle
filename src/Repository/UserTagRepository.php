@@ -13,7 +13,7 @@ use WechatWorkStaffBundle\Entity\UserTag;
  * @extends ServiceEntityRepository<UserTag>
  */
 #[AsRepository(entityClass: UserTag::class)]
-class UserTagRepository extends ServiceEntityRepository
+final class UserTagRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {

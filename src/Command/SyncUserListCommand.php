@@ -13,7 +13,7 @@ use WechatWorkStaffBundle\Message\SyncUserListMessage;
 use WechatWorkStaffBundle\MessageHandler\SyncUserListHandler;
 
 #[AsCommand(name: self::NAME, description: '同步指定企业的用户列表')]
-class SyncUserListCommand extends Command
+final class SyncUserListCommand extends Command
 {
     public const NAME = 'wechat-work:sync-user-list';
 

@@ -6,7 +6,7 @@ namespace WechatWorkStaffBundle\Tests\Procedure\User;
 
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
-use Tourze\JsonRPC\Core\Tests\AbstractProcedureTestCase;
+use Tourze\PHPUnitJsonRPC\AbstractProcedureTestCase;
 use WechatWorkStaffBundle\Procedure\User\GetWechatWorkUserByAuthCode;
 
 /**
@@ -34,13 +34,13 @@ final class GetWechatWorkUserByAuthCodeTest extends AbstractProcedureTestCase
         // Verify that execute method exists
         $this->assertTrue(method_exists($procedure, 'execute'), 'execute method should exist');
 
-        // Verify that execute method returns array type (based on return type declaration)
+        // Verify that execute method returns ArrayResult type (based on return type declaration)
         $reflection = new \ReflectionMethod($procedure, 'execute');
         $returnType = $reflection->getReturnType();
         $this->assertNotNull($returnType, 'execute method should have return type');
 
         if ($returnType instanceof \ReflectionNamedType) {
-            $this->assertEquals('array', $returnType->getName(), 'execute method should return array');
+            $this->assertEquals('Tourze\JsonRPC\Core\Result\ArrayResult', $returnType->getName(), 'execute method should return ArrayResult');
         }
     }
 }

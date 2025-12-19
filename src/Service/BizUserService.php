@@ -13,7 +13,7 @@ use WechatWorkStaffBundle\Exception\UserManagerUnavailableException;
 use WechatWorkStaffBundle\Repository\UserRepository;
 
 #[Autoconfigure(public: true)]
-class BizUserService
+final class BizUserService
 {
     public function __construct(
         private readonly ?UserManagerInterface $userManager = null,

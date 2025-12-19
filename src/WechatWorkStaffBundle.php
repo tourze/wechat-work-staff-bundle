@@ -10,6 +10,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Tourze\BundleDependency\BundleDependencyInterface;
 use Tourze\DoctrineResolveTargetEntityBundle\DependencyInjection\Compiler\ResolveTargetEntityPass;
+use Tourze\EasyAdminMenuBundle\EasyAdminMenuBundle;
 use Tourze\JsonRPCSecurityBundle\JsonRPCSecurityBundle;
 use Tourze\RoutingAutoLoaderBundle\RoutingAutoLoaderBundle;
 use Tourze\WechatWorkContracts\DepartmentInterface;
@@ -17,7 +18,6 @@ use Tourze\WechatWorkContracts\UserInterface;
 use WechatWorkBundle\WechatWorkBundle;
 use WechatWorkStaffBundle\Entity\Department;
 use WechatWorkStaffBundle\Entity\User;
-use Tourze\EasyAdminMenuBundle\EasyAdminMenuBundle;
 
 class WechatWorkStaffBundle extends Bundle implements BundleDependencyInterface
 {

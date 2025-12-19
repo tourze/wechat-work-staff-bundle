@@ -17,7 +17,7 @@ use WechatWorkStaffBundle\Request\Tag\UpdateTagRequest;
 #[AsEntityListener(event: Events::prePersist, method: 'prePersist', entity: UserTag::class)]
 #[AsEntityListener(event: Events::preRemove, method: 'preRemove', entity: UserTag::class)]
 #[AsEntityListener(event: Events::preUpdate, method: 'preUpdate', entity: UserTag::class)]
-class UserTagListener
+final class UserTagListener
 {
     public function __construct(private readonly ?WorkServiceInterface $workService = null)
     {

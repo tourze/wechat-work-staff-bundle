@@ -43,6 +43,7 @@ class MockLinkGenerator implements LinkGeneratorInterface
                 return str_replace('/', '\\', $parts[1]);
             }
         }
+
         return null;
     }
 
